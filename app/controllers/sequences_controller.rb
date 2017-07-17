@@ -25,6 +25,11 @@ class SequencesController < ApplicationController
     @sequence.destroy
   end
 
+  def count
+    @count = Sequence.count
+    json_response(@count)
+  end
+
   private
   def sequence_params
     params.permit(:title, :data, :width, :speed)
