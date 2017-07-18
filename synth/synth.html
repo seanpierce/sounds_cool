@@ -4,30 +4,30 @@
     <meta charset="utf-8">
     <title>Synth</title>
     <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
-    <script src="scripts.js" type="text/javascript"></script>
+    <!-- <script src="scripts.js" type="text/javascript"></script> -->
     <script src="synth.js" type="text/javascript"></script>
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
 
-    Repeater <span id="repeater-on">ON</span>  <span id="repeater-off">OFF</span>  speed: <input type="text" id="speed" value="200"> Trigger <span id="trigger-once">ON</span>
-    <hr>
+    <!-- Repeater <span id="repeater-on">ON</span>  <span id="repeater-off">OFF</span>  speed: <input type="text" id="speed" value="200"> Trigger <span id="trigger-once">ON</span>
+    <hr> -->
 
     <!-- VCO -->
-    <div class="module">
+    <!-- <div class="module">
       <div class="info">
         <label>VCO</label> <span id="current-pitch" style='color:blue;'>80</span>
       </div>
       <input type="range" min="20" max="2000" step="1" value="80" id="pitch" />
-    </div>
+    </div> -->
 
     <!-- lfo rate -->
-    <div class="module">
+    <!-- <div class="module">
       <div class="info">
         <label>LFO Rate</label> <span id="current-lfo-rate" style='color:blue;'>0</span>
       </div>
       <input type="range" min="0" max="500" step="1" value="0" id="lfo-rate" />
-    </div>
+    </div> -->
 
     <!-- vcf -->
     <div class="module">
@@ -46,12 +46,12 @@
     </div>
 
     <!-- panner -->
-    <div class="module">
+    <!-- <div class="module">
       <div class="info">
         <label>Stereo Panner</label> L:<span id="current-pan-left" style='color:blue;'>0</span> R:<span id="current-pan-right" style='color:blue;'>0</span>
       </div>
       <input type="range" min="-1" max="1" step="0.1" value="0" id="panner" />
-    </div>
+    </div> -->
 
     <!-- release -->
     <div class="module">
@@ -64,9 +64,12 @@
     <!-- VCA -->
     <div class="module">
       <div class="info">
-        <label>VCA</label> <span id="current-volume" style='color:blue;'>0</span>
+        <label>Master Volume</label> <span id="master-volume" style='color:blue;'>0</span>
       </div>
       <input type="range" min="0" max="1" step="0.01" value="0" id="volume" />
+    </div>
+
+    <div class="triggers">
     </div>
 
 
