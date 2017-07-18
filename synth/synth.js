@@ -11,7 +11,6 @@ class Oscillator {
     this.vco.frequency.value = pitch;
     this.vca = context.createGain();
     this.vco.connect(this.vca);
-    console.log(masterVolume);
     this.vca.connect(masterVolume);
     this.vco.type = "square";
     this.vco.start();
@@ -19,7 +18,6 @@ class Oscillator {
   }
 
   trigger(){
-    console.log('TRIGGER ALERT!');
     // this.vca.gain.value = 1;
     this.vca.gain.setTargetAtTime(1, this.context.currentTime, 0.01);
     this.vca.gain.setTargetAtTime(0, this.context.currentTime + 0.01, 0.35);
@@ -57,25 +55,48 @@ class Sequencer {
     }
   }
 
-  // step {
-  //   // triggered by interval
-  //   // reads sequence data
-  //   // plays oscillators at indeces in osillatorArray
-  //   // corresponding to indeces in sequence data where digit is 1
-  // }
-  //
-  // startSequencer {
-  //   // starts interval
-  //   // saves intervalID as instance variable
-  //   // interval triggers step method, every speed milliseconds
-  // }
+
+  // plays oscillators at indeces in osillatorArray
+  // corresponding to indeces in current step sequence data where digit is 1
+  step() {
+    var stepDads = this.sequenceData.substr(this.currentStep * this.vcoCount, this.vcoCount)
+    var indeces = this.getIndeces(stepDads)
+    indeces.forEach(index => {
+      this.oscillators[index].trigger();
+    });
+    if(this.currentStep < 15) {
+      this.currentStep += 1;
+    } else {
+      this.currentStep = 0;
+    }
+  }
+
+  getIndeces(stepDads){
+    var indeces = [];
+    var index = 0;
+    while(index <= stepDads.length){
+      index = stepDads.indexOf(1, index+1)
+      if(index === -1){ return indeces; }
+      indeces.push(index)
+    }
+  }
+
+  startSequencer() {
+    // starts interval
+    // saves intervalID as instance variable
+    // interval triggers step method, every speed milliseconds
+    this.intervalId = setInterval(function(scope){ scope.step()}, 200, this)
+  }
+
+  stopSequencer() {
+    clearInterval(this.intervalId);
+  }
 
 }
 
-var sequencer = new Sequencer(16, 'c_major', "00100101011100000010100101001");
+var sequencer = new Sequencer(16, 'c_major',"0000000000000001000000000000001000000000000001000000000000001000000000000001000000000000001000000000000001000000000000001000000000000001000000000000001000000000000001000000000000001000000000000001000000000000001000000000000001000000000000001000000000000000" );
 
-
-
+// "0000000000000010000001010011001000000101001100100000010100110010000001010011001000000101001100100000010100110010000001010011001000000101001100100000010100110010000001010011001000000101001100100000010100110010000001010011001000000101001100100000010100110010"
 // ----------------------------------------- UI test
 $(document).ready(function(){
   sequencer.oscillators.forEach((osc, index) => {
@@ -104,5 +125,13 @@ $(document).ready(function(){
   document.getElementById('reso').addEventListener('input', function() {
     sequencer.filter.Q.value = this.value;
     $('#current-filter-reso').text(this.value);
+  });
+
+  $('#start-sequencer').click(function(){
+    sequencer.startSequencer()
+  });
+
+  $('#stop-sequencer').click(function(){
+    sequencer.stopSequencer()
   });
 });
