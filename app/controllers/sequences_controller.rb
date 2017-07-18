@@ -12,7 +12,10 @@ class SequencesController < ApplicationController
 
   def create
     sequence = Sequence.create!(sequence_params)
-    json_response(sequence, :created)
+    render status: 201, json: {
+      message: "Sequence '#{sequence.title}' created successfully."
+    }
+    # json_response(sequence, :created)
   end
 
   def update
