@@ -10,24 +10,13 @@
   </head>
   <body>
 
-    <!-- Repeater <span id="repeater-on">ON</span>  <span id="repeater-off">OFF</span>  speed: <input type="text" id="speed" value="200"> Trigger <span id="trigger-once">ON</span>
-    <hr> -->
-
-    <!-- VCO -->
-    <!-- <div class="module">
+    <!-- Master Volume -->
+    <div class="module">
       <div class="info">
-        <label>VCO</label> <span id="current-pitch" style='color:blue;'>80</span>
+        <label>Master Volume</label> <span id="current-master-volume" style='color:blue;'>0</span>
       </div>
-      <input type="range" min="20" max="2000" step="1" value="80" id="pitch" />
-    </div> -->
-
-    <!-- lfo rate -->
-    <!-- <div class="module">
-      <div class="info">
-        <label>LFO Rate</label> <span id="current-lfo-rate" style='color:blue;'>0</span>
-      </div>
-      <input type="range" min="0" max="500" step="1" value="0" id="lfo-rate" />
-    </div> -->
+      <input type="range" min="0" max="1" step="0.01" value="0" id="master-volume" />
+    </div>
 
     <!-- vcf -->
     <div class="module">
@@ -45,33 +34,21 @@
       <input type="range" min="0" max="100" step="1" value="5" id="reso" />
     </div>
 
-    <!-- panner -->
-    <!-- <div class="module">
-      <div class="info">
-        <label>Stereo Panner</label> L:<span id="current-pan-left" style='color:blue;'>0</span> R:<span id="current-pan-right" style='color:blue;'>0</span>
-      </div>
-      <input type="range" min="-1" max="1" step="0.1" value="0" id="panner" />
-    </div> -->
-
     <!-- release -->
     <div class="module">
       <div class="info">
-        <label>Release</label> <span id="current-release" style='color:blue;'>0.15</span>
+        <label>VC Release</label> <span id="current-release" style='color:blue;'>0.15</span>
       </div>
       <input type="range" min="0" max="1" step="0.01" value="0.15" id="release" />
     </div>
 
-    <!-- Master Volume -->
-    <div class="module">
-      <div class="info">
-        <label>Master Volume</label> <span id="current-master-volume" style='color:blue;'>0</span>
-      </div>
-      <input type="range" min="0" max="1" step="0.01" value="0" id="master-volume" />
-    </div>
+    <hr>
 
     <div class="triggers"></div>
     <button type="button" id="start-sequencer">start</button>
-    <button type="button" id="stop-sequencer">stop</button>  
+    <button type="button" id="stop-sequencer">stop</button>
+
+    <div id="patterns"></div>
 
   </body>
 </html>
