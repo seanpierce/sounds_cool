@@ -99,4 +99,10 @@ $(document).ready(function(){
     sequencer.filter.frequency.value = this.value;
     $('#current-filter-cutoff').text(this.value);
   });
+
+  // filter resonance
+  document.getElementById('reso').addEventListener('input', function() {
+    sequencer.filter.Q.value = this.value;
+    $('#current-filter-reso').text(this.value);
+  });
 });
