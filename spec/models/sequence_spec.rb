@@ -7,4 +7,5 @@ RSpec.describe Sequence, type: :model do
   it { should validate_presence_of :speed }
   it { should validate_numericality_of :speed }
   it { should validate_numericality_of :width }
+  it { should validate_length_of(:data).is_equal_to 64}
 end
