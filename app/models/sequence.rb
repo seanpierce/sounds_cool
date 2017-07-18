@@ -4,6 +4,6 @@ class Sequence < ApplicationRecord
   validates :data, length: { is: 64 }
   validates :data, format: {
     with: /[01]{64}/,
-    message: "data can contain 0s or 1s"
+    message: "can only contain 0s or 1s"
   }
 end

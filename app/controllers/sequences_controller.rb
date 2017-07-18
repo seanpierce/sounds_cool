@@ -6,18 +6,21 @@ class SequencesController < ApplicationController
   end
 
   def show
-    @sequence = Sequence.find(params[:id])
-    json_response(@sequence)
+    sequence = Sequence.find(params[:id])
+    json_response(sequence)
   end
 
   def create
-    @sequence = Sequence.create!(sequence_params)
-    json_response(@sequence)
+    sequence = Sequence.create!(sequence_params)
+    json_response(sequence, :created)
   end
 
   def update
-    @sequence = Sequence.find(params[:id])
-    @sequence.update!(sequence_params)
+    sequence = Sequence.find(params[:id])
+    sequence.update!(sequence_params)
+    render status: 200, json: {
+      message: "Sequence updated successfully."
+    }
   end
 
   def destroy
