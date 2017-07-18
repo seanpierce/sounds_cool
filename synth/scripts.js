@@ -1,33 +1,43 @@
 window.onload = function() {
+
+  // variable declarations
   var context = new window.AudioContext(),
-      osc = context.createOscillator(),
-      vol = context.createGain(),
+      vco = context.createOscillator(),
+      vca = context.createGain(),
+      panner = context.createStereoPanner(),
       freqGain = context.createGain(),
       lfo = context.createOscillator(),
+      panControl = document.getElementById('panner'),
       lfoRate = document.getElementById('lfo-rate'),
-      volControl = document.getElementById('volume'),
+      vcaControl = document.getElementById('volume'),
       pitchControl = document.getElementById('pitch');
 
-  vol.gain.value = volControl.value;
-  vol.connect(context.destination);
+  // panner node
+  panner.connect(context.destination);
 
-  osc.frequency.value = 440;
-  osc.type = "square";
-  osc.connect(vol);
+  // volume node
+  vca.gain.value = vcaControl.value;
+  vca.connect(panner);
 
+  // vco node
+  vco.frequency.value = 80;
+  vco.type = "square";
+  vco.connect(vca);
+
+  // lfo node
   freqGain.gain.value = 100;
-  freqGain.connect(osc.frequency);
-
-  lfo.frequency.value = 1;
+  freqGain.connect(vco.frequency);
+  lfo.frequency.value = 0;
   lfo.connect(freqGain);
 
-  volControl.addEventListener('input', function() {
-    vol.gain.value = this.value;
+  // event listeners
+  vcaControl.addEventListener('input', function() {
+    vca.gain.value = this.value;
     $('#current-volume').text(this.value);
   });
 
   pitchControl.addEventListener('input', function() {
-    osc.frequency.value = this.value;
+    vco.frequency.value = this.value;
     $('#current-pitch').text(this.value);
   });
 
@@ -36,12 +46,18 @@ window.onload = function() {
     $('#current-lfo-rate').text(this.value);
   });
 
+  panControl.addEventListener('input', function() {
+    panner.pan.value = this.value;
+    $('#current-pan-position').text(this.value);
+  });
+
+  // turn vco on, off
   $('#synth-on').click(function() {
-    osc.start();
+    vco.start();
     lfo.start();
   });
   $('#synth-off').click(function() {
-    osc.stop();
+    vco.stop();
     lfo.stop();
   });
 };
