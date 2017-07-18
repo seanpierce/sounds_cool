@@ -40,7 +40,9 @@ class Sequencer {
     // this.lfo = this.context.createOscillator();
     this.filter = this.context.createBiquadFilter();
     this.genVCOs();
-    this.masterVolume.connect(this.context.destination)
+    this.masterVolume.gain.value = 0;
+    this.masterVolume.connect(this.filter);
+    this.filter.connect(this.context.destination);
   }
   genVCOs() {
     for(var i=1; i <= this.vcoCount; i++) {
@@ -92,5 +94,9 @@ $(document).ready(function(){
     $('#current-master-volume').text(this.value);
   });
 
-
+  // filter
+  document.getElementById('filter').addEventListener('input', function() {
+    sequencer.filter.frequency.value = this.value;
+    $('#current-filter-cutoff').text(this.value);
+  });
 });
