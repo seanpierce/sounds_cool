@@ -7,7 +7,7 @@ class Seed
 
   def gimme_data
     i = ""
-    64.times{|t| r = Random.new; i << r.rand(0..1).to_s}
+    256.times{|t| r = Random.new; i << r.rand(0..1).to_s}
     i
   end
 
