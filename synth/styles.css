@@ -9,6 +9,10 @@ input[type="range"] {
   width: 100%;
   max-width: 600px;
 }
-#synth-on, #synth-off {
+#repeater-on, #repeater-off, #trigger-once {
   cursor: pointer;
+  background-color: #f3f3f3;
+  border-bottom: solid 1px #bcbcbc;
+  border-left: solid 1px #bcbcbc;
+  padding: 5px;
 }

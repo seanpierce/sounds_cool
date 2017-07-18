@@ -2,12 +2,15 @@ window.onload = function() {
 
   // variable declarations
   var context = new window.AudioContext(),
+      releaseTime = 0.15,
+      intervalId,
       vco = context.createOscillator(),
       vca = context.createGain(),
       panner = context.createStereoPanner(),
       freqGain = context.createGain(),
       lfo = context.createOscillator(),
       filter = context.createBiquadFilter(),
+      releaseControl = document.getElementById('release'),
       filterCutoffControl = document.getElementById('filter'),
       repeaterSpeed = document.getElementById('speed'),
       filterResoControl = document.getElementById('reso'),
@@ -17,14 +20,14 @@ window.onload = function() {
       pitchControl = document.getElementById('pitch');
 
 
+      // trigger
+
+
       // repeater function
-      var intervalId;
       function repeater(time) {
         var intervalId = setInterval(function(){
-          vca.gain.value = 1;
-          setTimeout(function() {
-            vca.gain.value = 0;
-          }, (time / 2));
+          vca.gain.setTargetAtTime(1, context.currentTime, 0.01);
+          vca.gain.setTargetAtTime(0, context.currentTime + 0.01, releaseTime);
         }, time);
         return intervalId;
       }
@@ -88,13 +91,36 @@ window.onload = function() {
   filterResoControl.addEventListener('input', function() {
     filter.Q.value = this.value;
     $('#current-filter-reso').text(this.value);
+    if (this.value >= 30 && this.value <= 50) {
+      $('#current-filter-reso').css('color', 'orange');
+    } else if (this.value > 50) {
+      $('#current-filter-reso').css('color', 'red');
+    } else {
+      $('#current-filter-reso').css('color', 'blue');
+    }
   });
 
-  // turn vco on, off
-  $('#synth-on').click(function() {
-    intervalId = repeater(repeaterSpeed.value);
+  releaseControl.addEventListener('input', function() {
+    // now what?
+    releaseTime = this.value;
+    $('#current-release').text(this.value);
   });
-  $('#synth-off').click(function() {
+
+  // User Interactions
+
+  // repeater / arpeggiation
+  $('#repeater-on').click(function() {
+    intervalId = repeater(repeaterSpeed.value);
+    // vca.gain.setTargetAtTime(1, context.currentTime, 0.01);
+    // vca.gain.setTargetAtTime(0, context.currentTime + 0.01, 0.2);
+  });
+  $('#repeater-off').click(function() {
     clearInterval(intervalId);
   });
+
+  $('#trigger-once').click(function() {
+    vca.gain.setTargetAtTime(1, context.currentTime, 0.01);
+    vca.gain.setTargetAtTime(0, context.currentTime + 0.01, releaseTime);
+  });
+
 };
