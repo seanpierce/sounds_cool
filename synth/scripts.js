@@ -1,15 +1,16 @@
 window.onload = function() {
 
   // variable declarations
-  var context = new window.AudioContext(),
+  var context = new window.AudioContext(), // moved into sequencer initialize
       releaseTime = 0.15,
       intervalId,
-      vco = context.createOscillator(),
-      vca = context.createGain(),
-      panner = context.createStereoPanner(),
-      freqGain = context.createGain(),
-      lfo = context.createOscillator(),
-      filter = context.createBiquadFilter(),
+      // vco = context.createOscillator(),
+      // vco2 = context.createOscillator(),
+      vca = context.createGain(), // moved into sequencer initialize
+      panner = context.createStereoPanner(), // moved into sequencer initialize
+      freqGain = context.createGain(), // moved into sequencer initialize
+      lfo = context.createOscillator(), // moved into sequencer initialize
+      filter = context.createBiquadFilter(), // moved into sequencer initialize
       releaseControl = document.getElementById('release'),
       filterCutoffControl = document.getElementById('filter'),
       repeaterSpeed = document.getElementById('speed'),
@@ -21,13 +22,17 @@ window.onload = function() {
 
 
       // trigger
-
+      function trigger(release) {
+        vca.gain.setTargetAtTime(1, context.currentTime, 0.01);
+        vca.gain.setTargetAtTime(0, context.currentTime + 0.01, release);
+        // filter.frequency.setTargetAtTime(1000, context.currentTime, 0.01);
+        // filter.frequency.setTargetAtTime(0, context.currentTime + 0.01, release);
+      }
 
       // repeater function
       function repeater(time) {
         var intervalId = setInterval(function(){
-          vca.gain.setTargetAtTime(1, context.currentTime, 0.01);
-          vca.gain.setTargetAtTime(0, context.currentTime + 0.01, releaseTime);
+          trigger(releaseTime);
         }, time);
         return intervalId;
       }
@@ -46,13 +51,21 @@ window.onload = function() {
   vca.gain.value = vcaControl.value;
   vca.connect(panner);
 
-  // vco node
-  vco.frequency.value = 80;
-  vco.type = "square";
-  vco.connect(vca);
+  // vco nodes
+  var num_of_vcos = 1;
+  var vco_arr = [];
+  for(var i = 1; i <= num_of_vcos; i++) {
+    var vco = context.createOscillator();
+    vco.frequency.value = 80;
+    vco.type = "square";
+    vco.connect(vca);
+    vco_arr.push(vco);
+  }
 
   // start oscillators
-  vco.start();
+  vco_arr.forEach(vco => {
+    vco.start();
+  })
   lfo.start();
 
   // lfo node
@@ -107,20 +120,15 @@ window.onload = function() {
   });
 
   // User Interactions
-
   // repeater / arpeggiation
   $('#repeater-on').click(function() {
     intervalId = repeater(repeaterSpeed.value);
-    // vca.gain.setTargetAtTime(1, context.currentTime, 0.01);
-    // vca.gain.setTargetAtTime(0, context.currentTime + 0.01, 0.2);
   });
   $('#repeater-off').click(function() {
     clearInterval(intervalId);
   });
 
   $('#trigger-once').click(function() {
-    vca.gain.setTargetAtTime(1, context.currentTime, 0.01);
-    vca.gain.setTargetAtTime(0, context.currentTime + 0.01, releaseTime);
+    trigger(releaseTime);
   });
-
 };
