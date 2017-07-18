@@ -1,0 +1,18 @@
+input[type="range"] {
+  width: 100%;
+}
+.module {
+  background-color: #f3f3f3;
+  padding: 20px;
+  border-bottom: solid 2px #bcbcbc;
+  margin-bottom: 1em;
+  width: 100%;
+  max-width: 600px;
+}
+#repeater-on, #repeater-off, #trigger-once {
+  cursor: pointer;
+  background-color: #f3f3f3;
+  border-bottom: solid 1px #bcbcbc;
+  border-left: solid 1px #bcbcbc;
+  padding: 5px;
+}
