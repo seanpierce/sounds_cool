@@ -131,5 +131,4 @@ window.onload = function() {
   $('#trigger-once').click(function() {
     trigger(releaseTime);
   });
-
 };

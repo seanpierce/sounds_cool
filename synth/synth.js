@@ -38,7 +38,7 @@ class Sequencer {
     // this.panner = this.context.createStereoPanner();
     // this.lfoFreqGain = this.context.createGain();
     // this.lfo = this.context.createOscillator();
-    // this.filter = this.context.createBiquadFilter();
+    this.filter = this.context.createBiquadFilter();
     this.genVCOs();
     this.masterVolume.connect(this.context.destination)
   }
@@ -85,4 +85,12 @@ $(document).ready(function(){
     sequencer.oscillators[index].trigger();
 
   });
+
+  // master volume
+  document.getElementById('master-volume').addEventListener('input', function() {
+    sequencer.masterVolume.gain.value = this.value;
+    $('#current-master-volume').text(this.value);
+  });
+
+
 });
