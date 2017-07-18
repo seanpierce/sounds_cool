@@ -27,8 +27,11 @@ class SequencesController < ApplicationController
   end
 
   def destroy
-    @sequence = Sequence.find(params[:id])
-    @sequence.destroy
+    sequence = Sequence.find(params[:id])
+    sequence.destroy
+    render status: 200, json: {
+      message: "Sequence deleted successfully.'"
+    }
   end
 
   def count
