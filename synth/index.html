@@ -5,27 +5,61 @@
     <title>Synth</title>
     <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
     <script src="scripts.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="styles.css">
   </head>
   <body>
 
-    <span id="synth-on">ON</span> / <span id="synth-off">OFF</span>
+    Repeater: <span id="synth-on">ON</span> / <span id="synth-off">OFF</span> / speed: <input type="text" id="speed" value="200">
     <hr>
-    <span style="color:red;">Controls</span>
-    <br>
-    <input type="range" min="0" max="1" step="0.01" value="1" id="volume" />
-    <label>VCA</label> (<span id="current-volume" style='color:blue;'>1</span>)
-    <br>
-    <input type="range" min="20" max="2000" step="1" value="440" id="pitch" />
-    <label>VCO</label> (<span id="current-pitch" style='color:blue;'>80</span>)
-    <br>
+
+    <!-- VCO -->
+    <div class="module">
+      <div class="info">
+        <label>VCO</label> <span id="current-pitch" style='color:blue;'>80</span>
+      </div>
+      <input type="range" min="20" max="2000" step="1" value="80" id="pitch" />
+    </div>
+
     <!-- lfo rate -->
-    <input type="range" min="0" max="500" step="1" value="0" id="lfo-rate" />
-    <label>LFO Rate</label> (<span id="current-lfo-rate" style='color:blue;'>0</span>)
-    <br>
+    <div class="module">
+      <div class="info">
+        <label>LFO Rate</label> <span id="current-lfo-rate" style='color:blue;'>0</span>
+      </div>
+      <input type="range" min="0" max="500" step="1" value="0" id="lfo-rate" />
+    </div>
+
+    <!-- vcf -->
+    <div class="module">
+      <div class="info">
+        <label>VCF, Lowpass</label> <span id="current-filter-cutoff" style='color:blue;'>10000</span>
+      </div>
+      <input type="range" min="0" max="10000" step="1" value="10000" id="filter" />
+    </div>
+
+    <!-- vcf Q -->
+    <div class="module">
+      <div class="info">
+        <label>VCQ</label> <span id="current-filter-reso" style='color:blue;'>5</span>
+      </div>
+      <input type="range" min="0" max="100" step="1" value="5" id="reso" />
+    </div>
+
     <!-- panner -->
-    <input type="range" min="-1" max="1" step="0.01" value="0" id="panner" />
-    <label>Stero Panner</label> (<span id="current-pan-position" style='color:blue;'>1</span>)
-    <br>
+    <div class="module">
+      <div class="info">
+        <label>Stereo Panner</label> L:<span id="current-pan-left" style='color:blue;'>1</span> R:<span id="current-pan-right" style='color:blue;'>1</span>
+      </div>
+      <input type="range" min="-1" max="1" step="0.1" value="0" id="panner" />
+    </div>
+
+    <!-- VCA -->
+    <div class="module">
+      <div class="info">
+        <label>VCA</label> <span id="current-volume" style='color:blue;'>0</span>
+      </div>
+      <input type="range" min="0" max="1" step="0.01" value="0" id="volume" />
+    </div>
+
 
   </body>
 </html>
