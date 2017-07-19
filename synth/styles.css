@@ -1,6 +1,13 @@
 input[type="range"] {
   width: 100%;
 }
+.half {
+  width: 48%;
+  display: inline-block;
+}
+.right {
+  float: right;
+}
 .module {
   background-color: #f3f3f3;
   padding: 20px;

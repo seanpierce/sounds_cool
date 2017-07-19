@@ -5,7 +5,8 @@ const KEYS = {
 }
 
 // global VCO settings
-var release = 0.15,
+var attack = 0.01,
+    release = 0.15,
     speed = 200,
     lfoGain = 8,
     lfoFrequency = 10,
@@ -24,6 +25,7 @@ class Oscillator {
     this.vca.gain.value = 0;
     this.lfoGain = context.createGain();
     this.lfo = context.createOscillator();
+    this.lfo.type = "sine"
     this.lfoGain.gain.value = 0;
     this.lfoGain.connect(this.vco.frequency);
     this.lfo.frequency.value = 0;
@@ -31,9 +33,10 @@ class Oscillator {
     this.lfo.start();
   }
 
+  // envelope generator
   trigger() {
-    this.vca.gain.setTargetAtTime(1, this.context.currentTime, 0.01);
-    this.vca.gain.setTargetAtTime(0, this.context.currentTime + 0.01, release);
+    this.vca.gain.setTargetAtTime(1, this.context.currentTime, attack);
+    this.vca.gain.setTargetAtTime(0, this.context.currentTime + attack, release);
   }
 }
 
@@ -47,20 +50,14 @@ class Sequencer {
     this.context = new window.AudioContext();
     this.masterVolume = this.context.createGain();
     this.filter = this.context.createBiquadFilter();
+    this.filter.type  = "lowpass";
     this.filter.frequency.value = 10000;
-    // this.lfoGain = this.context.createGain();
-    // this.lfo = this.context.createOscillator();
-    // this.lfoGain.gain.value = 100;
-    // this.lfoGain.connect(this.filter);
-    // this.lfo.frequency.value = 1;
-    // this.lfo.connect(this.lfoGain);
-    // this.lfo.start();
     this.genVCOs();
     this.masterVolume.gain.value = 0.5;
     this.masterVolume.connect(this.filter);
+    this.filter.connect(this.context.destination);
     this.analyser = this.context.createAnalyser();
     this.masterVolume.connect(this.analyser);
-    this.filter.connect(this.context.destination);
   }
   genVCOs() {
     for(var i=1; i <= this.vcoCount; i++) {
@@ -211,11 +208,11 @@ $(document).ready(function(){
 
     analyser.getByteTimeDomainData(timeData);
 
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.9';
-    ctx.fillRect(0, 0, width, height);
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.25';
+    ctx.fillRect(0, 0, height, width);
 
     ctx.lineWidth = 1;
-    ctx.strokeStyle = 'rgb(255, 0, 0)';
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
     ctx.beginPath();
 
     // No buffer overrun protection
@@ -231,18 +228,7 @@ $(document).ready(function(){
     ctx.stroke();
   }
 
-
   draw();
-
-
-
-
-
-
-
-
-
-
 
   // request all sequences form API
   $.get("http://localhost:3000/sequences").done(sequences => {
@@ -294,10 +280,22 @@ $(document).ready(function(){
     $('#current-filter-reso').text(this.value);
   });
 
+  // filter type
+  document.getElementById('filter-type').addEventListener('change', function() {
+    sequencer.filter.type = $("input[name=filter]:checked").val();
+  });
+
   // sequence speed
   document.getElementById('speed').addEventListener('input', function() {
     speed = this.value;
     $('#current-speed').text(this.value);
+  });
+
+  // attack
+  // NOTE: why why why does to precision get funky?
+  document.getElementById('attack').addEventListener('input', function() {
+    attack = Number.parseFloat(this.value)
+    $('#current-attack').text(this.value);
   });
 
   // release
