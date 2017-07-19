@@ -4,6 +4,9 @@ const KEYS = {
   "depressed_daikon": []
 }
 
+var release = 0.15;
+var speed = 200;
+
 class Oscillator {
   constructor(pitch, context, masterVolume) {
     this.context = context;
@@ -20,7 +23,7 @@ class Oscillator {
   trigger(){
     // this.vca.gain.value = 1;
     this.vca.gain.setTargetAtTime(1, this.context.currentTime, 0.01);
-    this.vca.gain.setTargetAtTime(0, this.context.currentTime + 0.01, 0.35);
+    this.vca.gain.setTargetAtTime(0, this.context.currentTime + 0.01, release);
   }
 }
 
@@ -37,6 +40,7 @@ class Sequencer {
     // this.lfoFreqGain = this.context.createGain();
     // this.lfo = this.context.createOscillator();
     this.filter = this.context.createBiquadFilter();
+    this.filter.frequency.value = 10000;
     this.genVCOs();
     this.masterVolume.gain.value = 0;
     this.masterVolume.connect(this.filter);
@@ -94,18 +98,26 @@ class Sequencer {
 
 }
 
-var sequencer = new Sequencer(16, 'c_major',"0000000000000001000000000000001000000000000001000000000000001000000000000001000000000000001000000000000001000000000000001000000000000001000000000000001000000000000001000000000000001000000000000001000000000000001000000000000001000000000000001000000000000000" );
+var sequencer = new Sequencer(16, 'c_major',"0000000000000001000000000000000000000000000010000000000000010000000000000010000000000000010000000000000010000000000000000000000100000010010000000000010000000000000010000000000000010000000000000000000000000000000010000000000010000000000000000000001000000001" );
 
 // ----------------------------------------- UI
 $(document).ready(function(){
 
+  // request all sequences form API
   $.get("http://localhost:3000/sequences").done(sequences => {
     sequences.forEach(sequence => {
       $('#patterns').append(
         `<button class="pattern-button" data-pattern="${sequence.data}">${sequence.title}</button>`
       );
+      // set sequence data onclick
+    });
+    $('.pattern-button').click(function() {
+      sequencer.sequenceData = $(this).attr('data-pattern');
+      console.log('dang');
     });
   });
+
+
 
   sequencer.oscillators.forEach((osc, index) => {
       $(".triggers").append(`<button class="button" id="${index}">${index+1}</button>`);
@@ -133,6 +145,12 @@ $(document).ready(function(){
   document.getElementById('reso').addEventListener('input', function() {
     sequencer.filter.Q.value = this.value;
     $('#current-filter-reso').text(this.value);
+  });
+
+  // release
+  document.getElementById('release').addEventListener('input', function() {
+    release = this.value;
+    $('#current-release').text(this.value);
   });
 
   $('#start-sequencer').click(function(){
