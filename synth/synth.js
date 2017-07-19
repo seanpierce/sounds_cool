@@ -1,7 +1,8 @@
 const KEYS = {
   "c_major_garbage": [65.41, 73.42, 82.41, 87.31, 98.00, 110.00, 123.47, 130.81, 146.83, 164.81, 174.61, 196.00, 220.00, 246.94, 261.63, 293.66],
   "dj_barakas": [],
-  "depressed_daikon": []
+  "depressed_daikon": [],
+  "polka_savage": []
 }
 
 // global VCO settings
@@ -10,6 +11,7 @@ var attack = 0.01,
     speed = 200,
     lfoGain = 8,
     lfoFrequency = 10,
+    courseTune = 0,
     vclpf = 10000;
 
 class Oscillator {
@@ -25,7 +27,7 @@ class Oscillator {
     this.vca.gain.value = 0;
     this.lfoGain = context.createGain();
     this.lfo = context.createOscillator();
-    this.lfo.type = "sine"
+    this.lfo.type = "sine";
     this.lfoGain.gain.value = 0;
     this.lfoGain.connect(this.vco.frequency);
     this.lfo.frequency.value = 0;
@@ -52,10 +54,18 @@ class Sequencer {
     this.filter = this.context.createBiquadFilter();
     this.filter.type  = "lowpass";
     this.filter.frequency.value = 10000;
+    this.filter.connect(this.context.destination);
+    this.lfoGain = this.context.createGain();
+    this.lfo = this.context.createOscillator();
+    this.lfo.type = "sine";
+    this.lfoGain.gain.value = 0;
+    this.lfoGain.connect(this.filter.detune);
+    this.lfo.frequency.value = 0;
+    this.lfo.connect(this.lfoGain);
+    this.lfo.start();
     this.genVCOs();
     this.masterVolume.gain.value = 0.5;
     this.masterVolume.connect(this.filter);
-    this.filter.connect(this.context.destination);
     this.analyser = this.context.createAnalyser();
     this.masterVolume.connect(this.analyser);
   }
@@ -304,7 +314,7 @@ $(document).ready(function(){
     $('#current-release').text(this.value);
   });
 
-  // lfo-gain
+  // lfo-vco-gain
   document.getElementById('lfo-gain').addEventListener('input', function() {
     sequencer.oscillators.forEach(oscillator => {
       oscillator.lfoGain.gain.value = this.value;
@@ -312,12 +322,31 @@ $(document).ready(function(){
     $('#current-lfo-gain').text(this.value);
   });
 
-  // lfo-frequency
+  // lfo-vco-frequency
   document.getElementById('lfo-frequency').addEventListener('input', function() {
     sequencer.oscillators.forEach(oscillator => {
       oscillator.lfo.frequency.value = this.value;
     });
     $('#current-lfo-frequency').text(this.value);
+  });
+
+  // lfo-filter-gain
+  document.getElementById('lfo-filter-gain').addEventListener('input', function() {
+    sequencer.lfoGain.gain.value = this.value;
+    $('#current-lfo-filter-gain').text(this.value);
+  });
+
+  // lfo-filter-frequency
+  document.getElementById('lfo-filter-frequency').addEventListener('input', function() {
+    sequencer.lfo.frequency.value= this.value;
+    $('#current-lfo-filter-frequency').text(this.value);
+  });
+
+  // vco waveshape
+  document.getElementById('vco-waveshape').addEventListener('change', function() {
+    sequencer.oscillators.forEach(oscillator => {
+      oscillator.vco.type = $("input[name=waveshape]:checked").val();
+    });
   });
 
   $('#start-sequencer').click(function(){
