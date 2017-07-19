@@ -42,7 +42,7 @@ class Sequencer {
     this.filter = this.context.createBiquadFilter();
     this.filter.frequency.value = 10000;
     this.genVCOs();
-    this.masterVolume.gain.value = 0;
+    this.masterVolume.gain.value = 0.5;
     this.masterVolume.connect(this.filter);
     this.filter.connect(this.context.destination);
   }
@@ -92,7 +92,7 @@ class Sequencer {
     } else {
       this.currentStep = 0;
     }
-
+    this.timeoutId = setTimeout(function(scope){ scope.step()}, speed, this)
   }
 
   getIndeces(stepDads){
@@ -107,11 +107,11 @@ class Sequencer {
     // starts interval
     // saves intervalID as instance variable
     // interval triggers step method, every speed milliseconds
-    this.intervalId = setInterval(function(scope){ scope.step()}, 200, this)
+    this.timeoutId = setTimeout(function(scope){ scope.step()}, speed, this)
   }
 
   stopSequencer() {
-    clearInterval(this.intervalId);
+    clearTimeout(this.timeoutId);
   }
 
 }
@@ -232,6 +232,12 @@ $(document).ready(function(){
   document.getElementById('reso').addEventListener('input', function() {
     sequencer.filter.Q.value = this.value;
     $('#current-filter-reso').text(this.value);
+  });
+
+  // sequence speed
+  document.getElementById('speed').addEventListener('input', function() {
+    speed = this.value;
+    $('#current-speed').text(this.value);
   });
 
   // release
