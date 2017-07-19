@@ -59,6 +59,22 @@ class Sequencer {
     }
   }
 
+  toggle(id){
+    var str = this.sequenceData.split("")
+    str[id] = str[id] === "1" ? "0" : "1"
+    this.sequenceData = str.join("")
+    $.ajax({
+      url: `http://localhost:3000/sequences/${this.sequenceId}`,
+      type: "PUT",
+      data: {
+        title: this.sequenceTitle,
+        data: this.sequenceData,
+        speed: 200,
+        width: 300
+      }
+    }).done(function(data){
+    })
+  }
 
   // plays oscillators at indeces in osillatorArray
   // corresponding to indeces in current step sequence data where digit is 1
@@ -68,21 +84,23 @@ class Sequencer {
     indeces.forEach(index => {
       this.oscillators[index].trigger();
     });
+
+    highlightRow(this.currentStep, indeces)
+
     if(this.currentStep < 15) {
       this.currentStep += 1;
     } else {
       this.currentStep = 0;
     }
+
   }
 
   getIndeces(stepDads){
-    var indeces = [];
-    var index = 0;
-    while(index <= stepDads.length){
-      index = stepDads.indexOf(1, index+1)
-      if(index === -1){ return indeces; }
-      indeces.push(index)
+    let indeces = [];
+    for(let i = 0; i < stepDads.length; i++){
+      if(stepDads[i] === "1"){ indeces.push(i)}
     }
+    return indeces;
   }
 
   startSequencer() {
@@ -100,6 +118,68 @@ class Sequencer {
 
 var sequencer = new Sequencer(16, 'c_major',"0000000000000001000000000000000000000000000010000000000000010000000000000010000000000000010000000000000010000000000000000000000100000010010000000000010000000000000010000000000000010000000000000000000000000000000010000000000010000000000000000000001000000001" );
 
+function toggleMarked(element){
+
+  if(element.hasClass("marked")){
+    element.removeClass("marked")
+  } else {
+    element.addClass("marked")
+  }
+}
+
+function generateGrid(){
+  for(var i = 0; i < sequencer.vcoCount; i++){
+    $("#grid").append(`<div class="row" id="row-${i}"></div>`)
+    for(var n = 0; n < sequencer.vcoCount; n++){
+      $(`#row-${i}`).append(`<div class="square" id="square-${(i*16)+n}"></div>`)
+
+      $(`#square-${(i*16)+n}`).click(function(){
+        var id = $(this).attr("id").match(/[0-9]+/)[0];
+        sequencer.toggle(id);
+        toggleMarked($(this));
+      })
+    }
+  }
+  placeMarkers();
+}
+
+function placeMarkers(){
+  for(var i = 0; i < 16; i++){
+    var rowData = sequencer.sequenceData.substr(i*16, 16);
+    for(var n = 0; n < 16; n++){
+      $(`#row-${i} #square-${(i*16)+n}`).removeClass("marked")
+      if(rowData.charAt(n) === "1"){
+        $(`#row-${i} #square-${(i*16)+n}`).addClass("marked")
+      }
+    }
+  }
+}
+
+function highlightRow(rowId, indeces){
+  var prev;
+  if(rowId === 0){
+    prev = 15;
+  } else {
+    prev = rowId - 1;
+  }
+  for(var i = 0; i < 16; i++){
+    $(`#row-${prev} #square-${(prev*16)+i}`).removeClass("active pressed");
+    $(`#row-${rowId} #square-${(rowId*16)+i}`).addClass("active");
+  }
+  indeces.forEach(index => {
+    $(`#row-${rowId} #square-${(rowId*16)+index}`).addClass("pressed")
+  });
+}
+
+function getPattern(id){
+  $.get(`http://localhost:3000/sequences/${id}`).done(sequence => {
+    sequencer.sequenceTitle = sequence.title;
+    sequencer.sequenceData = sequence.data;
+    sequencer.sequenceId = sequence.id;
+    placeMarkers();
+  });
+}
+
 // ----------------------------------------- UI
 $(document).ready(function(){
 
@@ -107,7 +187,7 @@ $(document).ready(function(){
   $.get("http://localhost:3000/sequences").done(sequences => {
     sequences.forEach(sequence => {
       $('#patterns').append(
-        `<button class="pattern-button" data-pattern="${sequence.data}">${sequence.title}</button>`
+        `<button class="pattern-button" data-id="${sequence.id}" >${sequence.title}</button>`
       );
       // set sequence data onclick
     });
@@ -115,9 +195,15 @@ $(document).ready(function(){
       sequencer.sequenceData = $(this).attr('data-pattern');
       console.log('dang');
     });
+    $('.pattern-button').click(function(){
+      var id = $(this).attr('data-id');
+      getPattern(id);
+
+
+    });
   });
 
-
+  generateGrid();
 
   sequencer.oscillators.forEach((osc, index) => {
       $(".triggers").append(`<button class="button" id="${index}">${index+1}</button>`);
