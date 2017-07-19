@@ -46,11 +46,15 @@ class Sequencer {
     this.currentStep = 0;
     this.context = new window.AudioContext();
     this.masterVolume = this.context.createGain();
-    // this.panner = this.context.createStereoPanner();
-    // this.lfoFreqGain = this.context.createGain();
-    // this.lfo = this.context.createOscillator();
     this.filter = this.context.createBiquadFilter();
     this.filter.frequency.value = 10000;
+    // this.lfoGain = this.context.createGain();
+    // this.lfo = this.context.createOscillator();
+    // this.lfoGain.gain.value = 100;
+    // this.lfoGain.connect(this.filter);
+    // this.lfo.frequency.value = 1;
+    // this.lfo.connect(this.lfoGain);
+    // this.lfo.start();
     this.genVCOs();
     this.masterVolume.gain.value = 0.5;
     this.masterVolume.connect(this.filter);
@@ -61,12 +65,7 @@ class Sequencer {
   genVCOs() {
     for(var i=1; i <= this.vcoCount; i++) {
       var pitch = KEYS['c_major_garbage'][i-1];
-      var osc = new Oscillator(pitch, this.context, this.masterVolume)
-      // var vco = context.createOscillator(pitch, context);
-      // vco.frequency.value = KEYS['c_major'][i-1]; // key value
-      // vco.type = "square";
-      // vco.connect(vca);
-      // vco.start();
+      var osc = new Oscillator(pitch, this.context, this.masterVolume);
       this.oscillators.push(osc);
     }
   }
@@ -129,55 +128,6 @@ class Sequencer {
 }
 
 var sequencer = new Sequencer(16, 'c_major',"0000000000000001000000000000000000000000000010000000000000010000000000000010000000000000010000000000000010000000000000000000000100000010010000000000010000000000000010000000000000010000000000000000000000000000000010000000000010000000000000000000001000000001" );
-
-// ------------- BEGIN ANALYSER BLOCK
-// var analyser = sequencer.context.createAnalyser();
-// analyser.fftSize = 2048;
-// var bufferLength = analyser.frequencyBinCount;
-// var dataArray = new Uint8Array(bufferLength);
-// analyser.getByteTimeDomainData(dataArray);
-//
-// // Get a canvas defined with ID "oscilloscope"
-// // var canvas = document.getElementById("oscilloscope");
-// // var canvasContext = canvas.getContext("2d");
-//
-// // draw an oscilloscope of the current audio source
-// function draw(canvas, canvasContext) {
-//
-//   drawVisual = requestAnimationFrame(draw);
-//
-//   analyser.getByteTimeDomainData(dataArray);
-//
-//   canvasContext.fillStyle = 'rgba(255, 255, 255, 0)';
-//   canvasContext.fillRect(0, 0, canvas.width, canvas.height);
-//
-//   canvasContext.lineWidth = 2;
-//   canvasContext.strokeStyle = 'rgb(0, 0, 0)';
-//
-//   canvasContext.beginPath();
-//
-//   var sliceWidth = canvas.width * 1.0 / bufferLength;
-//   var x = 0;
-//
-//   for (var i = 0; i < bufferLength; i++) {
-//
-//     var v = dataArray[i] / 128.0;
-//     var y = v * canvas.height / 2;
-//
-//     if (i === 0) {
-//       canvasContext.moveTo(x, y);
-//     } else {
-//       canvasContext.lineTo(x, y);
-//     }
-//
-//     x += sliceWidth;
-//   }
-//
-//   canvasContext.lineTo(canvas.width, canvas.height / 2);
-//   canvasContext.stroke();
-// };
-// ----------- END ANALYZER BLOCK
-
 
 function toggleMarked(element){
 
@@ -244,41 +194,12 @@ function getPattern(id){
 // ----------------------------------------- UI
 $(document).ready(function(){
 
-
-  // var canvas = document.getElementById("oscilloscope");
-  // var canvasContext = canvas.getContext("2d");
-  // console.log(canvas);
-  // console.log(canvasContext);
-  // draw(canvas, canvasContext);
-
   var canvasContext = document.getElementById('oscilloscope').getContext('2d');
 
   function draw() {
     drawScope(sequencer.analyser, canvasContext);
-
     requestAnimationFrame(draw);
   }
-
-  // function drawSpectrum(analyser, ctx) {
-  //   var width = ctx.canvas.width;
-  //   var height = ctx.canvas.height;
-  //   var freqData = new Uint8Array(analyser.frequencyBinCount);
-  //   var scaling = height / 256;
-  //
-  //   analyser.getByteFrequencyData(freqData);
-  //
-  //   ctx.fillStyle = 'rgba(0, 0, 0, 0)';
-  //   ctx.fillRect(0, 0, width, height);
-  //
-  //   ctx.lineWidth = 2;
-  //   ctx.strokeStyle = 'rgb(0, 0, 0)';
-  //   ctx.beginPath();
-  //
-  //   for (var x = 0; x < width; x++)
-  //     ctx.lineTo(x, height - freqData[x] * scaling);
-  //
-  //   ctx.stroke();
-  // }
 
   function drawScope(analyser, ctx) {
     var width = ctx.canvas.width;
@@ -286,15 +207,15 @@ $(document).ready(function(){
     var timeData = new Uint8Array(analyser.frequencyBinCount);
     var scaling = height / 256;
     var risingEdge = 0;
-    var edgeThreshold = 5;
+    var edgeThreshold = 0;
 
     analyser.getByteTimeDomainData(timeData);
 
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.9';
     ctx.fillRect(0, 0, width, height);
 
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = 'rgb(0, 0, 0)';
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgb(255, 0, 0)';
     ctx.beginPath();
 
     // No buffer overrun protection
