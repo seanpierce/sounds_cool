@@ -4,8 +4,12 @@ const KEYS = {
   "depressed_daikon": []
 }
 
-var release = 0.15;
-var speed = 200;
+// global VCO settings
+var release = 0.15,
+    speed = 200,
+    lfoGain = 8,
+    lfoFrequency = 10,
+    vclpf = 10000;
 
 class Oscillator {
   constructor(pitch, context, masterVolume) {
@@ -18,6 +22,13 @@ class Oscillator {
     this.vco.type = "square";
     this.vco.start();
     this.vca.gain.value = 0;
+    this.lfoGain = context.createGain();
+    this.lfo = context.createOscillator();
+    this.lfoGain.gain.value = 0;
+    this.lfoGain.connect(this.vco.frequency);
+    this.lfo.frequency.value = 0;
+    this.lfo.connect(this.lfoGain);
+    this.lfo.start();
   }
 
   trigger(){
@@ -244,6 +255,22 @@ $(document).ready(function(){
   document.getElementById('release').addEventListener('input', function() {
     release = this.value;
     $('#current-release').text(this.value);
+  });
+
+  // lfo-gain
+  document.getElementById('lfo-gain').addEventListener('input', function() {
+    sequencer.oscillators.forEach(oscillator => {
+      oscillator.lfoGain.gain.value = this.value;
+    });
+    $('#current-lfo-gain').text(this.value);
+  });
+
+  // lfo-frequency
+  document.getElementById('lfo-frequency').addEventListener('input', function() {
+    sequencer.oscillators.forEach(oscillator => {
+      oscillator.lfo.frequency.value = this.value;
+    });
+    $('#current-lfo-frequency').text(this.value);
   });
 
   $('#start-sequencer').click(function(){
