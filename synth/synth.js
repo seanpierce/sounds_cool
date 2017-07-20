@@ -25,7 +25,6 @@ class Oscillator {
     this.lfo.connect(this.lfoGain);
     this.lfoGain.connect(this.vco.frequency);
 
-
     // configuration
     this.vco.type = "square";
     this.vco.frequency.value = pitch;
@@ -33,7 +32,6 @@ class Oscillator {
     this.lfo.type = "sine";
     this.lfo.frequency.value = 0;
     this.lfoGain.gain.value = 0;
-
 
     // initialization
     this.vco.start();
@@ -84,6 +82,7 @@ class Sequencer {
     this.masterVolume.gain.value = 0.5;
     this.filter.type  = "lowpass";
     this.filter.frequency.value = 10000;
+    this.filter.Q.value = 1;
 
     // initialization
     this.lfo.start();
@@ -99,9 +98,9 @@ class Sequencer {
   }
 
   toggle(id) {
-    let str = this.sequenceData.split("")
-    str[id] = str[id] === "1" ? "0" : "1"
-    this.sequenceData = str.join("")
+    let str = this.sequenceData.split("");
+    str[id] = str[id] === "1" ? "0" : "1";
+    this.sequenceData = str.join("");
   }
 
   // TODO: call method on save click
@@ -142,30 +141,79 @@ class Sequencer {
     return indeces;
   }
 
-  startSequencer() {
+  start() {
     this.timeoutId = setTimeout(function(scope){ scope.step() }, this.speed, this);
   }
 
-  stopSequencer() {
+  stop() {
     clearTimeout(this.timeoutId);
   }
 }
 
-// TODO: initialize sequencer with AJAX request
-const SEQUENCER = new Sequencer(16, 'c_major',"0000000000000001000000000000000000000000000010000000000000010000000000000010000000000000010000000000000010000000000000000000000100000010010000000000010000000000000010000000000000010000000000000000000000000000000010000000000010000000000000000000001000000001" );
+class Controller {
+  constructor() {
+    this.sequencer = new Sequencer(16, 'c_major',"0000000000000001000000000000000000000000000010000000000000010000000000000010000000000000010000000000000010000000000000000000000100000010010000000000010000000000000010000000000000010000000000000000000000000000000010000000000010000000000000000000001000000001");
+  }
+
+  setSequencerMasterVolume(value) {
+    this.sequencer.masterVolume.gain.value = value;
+  }
+
+  setSequencerFilterCutoff(value) {
+    this.sequencer.filter.frequency.value = value;
+  }
+
+  setSequencerFilterResonance(value) {
+    this.sequencer.filter.Q.value = value;
+  }
+
+  setSequencerFilterType(type) {
+    this.sequencer.filter.type = type;
+  }
+
+  setSequencerSpeed(value) {
+    this.sequencer.speed = value;
+  }
+
+  setSequencerAttack(value) {
+    this.sequencer.attack = value;
+  }
+
+  setSequencerRelease(value) {
+    this.sequencer.release = value;
+  }
+
+  setSequencerFilterLfoGain(value) {
+    this.sequencer.lfoGain.gain.value = value;
+  }
+
+  setSequencerFilterLfoFrequency(value) {
+    this.sequencer.lfo.frequency.value = value;
+  }
+
+  startSequencer() {
+    this.sequencer.start()
+  }
+
+  stopSequencer() {
+    this.sequencer.stop()
+  }
+}
+
+const CONTROLLER = new Controller();
 
 function toggleMarked(element){
   element.hasClass("marked") ? element.removeClass("marked") : element.addClass("marked");
 }
 
 function generateGrid(){
-  for(let i = 0; i < SEQUENCER.vcoCount; i++){
+  for(let i = 0; i < CONTROLLER.sequencer.vcoCount; i++){
     $("#grid").append(`<div class="col" id="col-${i}"></div>`)
-    for(let n = 0; n < SEQUENCER.vcoCount; n++){
+    for(let n = 0; n < CONTROLLER.sequencer.vcoCount; n++){
       $(`#col-${i}`).append(`<div class="square" id="square-${(i*16)+n}"></div>`);
       $(`#square-${(i*16)+n}`).click(function(){
         let id = $(this).attr("id").match(/[0-9]+/)[0];
-        SEQUENCER.toggle(id);
+        CONTROLLER.sequencer.toggle(id);
         toggleMarked($(this));
       })
     }
@@ -175,7 +223,7 @@ function generateGrid(){
 
 function placeMarkers(){
   for(let i = 0; i < 16; i++){
-    let rowData = SEQUENCER.sequenceData.substr(i*16, 16);
+    let rowData = CONTROLLER.sequencer.sequenceData.substr(i*16, 16);
     for(let n = 0; n < 16; n++){
       $(`#col-${i} #square-${(i*16)+n}`).removeClass("marked")
       if(rowData.charAt(n) === "1"){
@@ -197,9 +245,9 @@ function highlightRow(colId){
 
 function getPattern(id){
   $.get(`http://localhost:3000/sequences/${id}`).done(sequence => {
-    SEQUENCER.sequenceTitle = sequence.title;
-    SEQUENCER.sequenceData = sequence.data;
-    SEQUENCER.sequenceId = sequence.id;
+    CONTROLLER.sequencer.sequenceTitle = sequence.title;
+    CONTROLLER.sequencer.sequenceData = sequence.data;
+    CONTROLLER.sequencer.sequenceId = sequence.id;
     placeMarkers();
   });
 }
@@ -219,9 +267,9 @@ function placePreviewMarkers(sequence){
 function generatePreview(sequence){
   $('#grids').append(`<div class="preview" id="preview-${sequence.id}"></div>`)
   $(`#preview-${sequence.id}`).css("background-color",`rgb(${Math.floor(Math.random()*(255+1))},${Math.floor(Math.random()*(255+1))},${Math.floor(Math.random()*(255+1))})`)
-  for(let i = 0; i < SEQUENCER.vcoCount; i++){
+  for(let i = 0; i < CONTROLLER.sequencer.vcoCount; i++){
     $(`#preview-${sequence.id}`).append(`<div class="p-col" id="p-col-${i}"></div>`)
-    for(let n = 0; n < SEQUENCER.vcoCount; n++){
+    for(let n = 0; n < CONTROLLER.sequencer.vcoCount; n++){
       $(`#preview-${sequence.id} #p-col-${i}`).append(`<div class="p-square" id="p-square-${(i*16)+n}"></div>`)
     }
   }
@@ -234,7 +282,7 @@ function generatePreview(sequence){
 // ----------------------------------------- UI
 $(document).ready(function(){
   function draw() {
-    drawScope(SEQUENCER.analyser, canvasContext);
+    drawScope(CONTROLLER.sequencer.analyser, canvasContext);
     requestAnimationFrame(draw);
   }
 
@@ -279,68 +327,60 @@ $(document).ready(function(){
       );
     });
     $('.pattern-button').click(function(){
-      console.log('dang');
       let id = $(this).attr('data-id');
       getPattern(id);
     });
   });
 
   generateGrid();
-  // SEQUENCER.oscillators.forEach((osc, index) => {
-  //     $(".triggers").append(`<button class="button" id="${index}">${index+1}</button>`);
-  // });
-
-  $(".button").click(function(){
-    let index = parseInt($(this).attr('id'), 10);
-    SEQUENCER.oscillators[index].trigger();
-
-  });
 
   // master volume
   document.getElementById('master-volume').addEventListener('input', function() {
-    SEQUENCER.masterVolume.gain.value = this.value;
+    CONTROLLER.setSequencerMasterVolume(this.value);
     $('#current-master-volume').text(this.value);
   });
 
   // filter
   document.getElementById('filter').addEventListener('input', function() {
-    SEQUENCER.filter.frequency.value = this.value;
+    CONTROLLER.setSequencerFilterCutoff(this.value);
     $('#current-filter-cutoff').text(this.value);
   });
 
   // filter resonance
   document.getElementById('reso').addEventListener('input', function() {
-    SEQUENCER.filter.Q.value = this.value;
+    CONTROLLER.setSequencerFilterResonance(this.value);
     $('#current-filter-reso').text(this.value);
   });
 
   // filter type
   document.getElementById('filter-type').addEventListener('change', function() {
-    SEQUENCER.filter.type = $("input[name=filter]:checked").val();
+    let type = $("input[name=filter]:checked").val();
+    CONTROLLER.setSequencerFilterType(type);
   });
 
   // sequence speed
   document.getElementById('speed').addEventListener('input', function() {
-    SEQUENCER.speed = this.value;
+    CONTROLLER.setSequencerSpeed(this.value);
     $('#current-speed').text(this.value);
   });
 
   // attack
   // NOTE: why why why does to precision get funky?
   document.getElementById('attack').addEventListener('input', function() {
-    SEQUENCER.attack = Number.parseFloat(this.value)
-    $('#current-attack').text(this.value);
+    let value = Number.parseFloat(this.value);
+    CONTROLLER.setSequencerAttack(value);
+    $('#current-attack').text(value);
   });
 
   // release
   document.getElementById('release').addEventListener('input', function() {
-    SEQUENCER.release = this.value;
+    CONTROLLER.setSequencerRelease(this.value);
     $('#current-release').text(this.value);
   });
 
   // lfo-vco-gain
   document.getElementById('lfo-gain').addEventListener('input', function() {
-    SEQUENCER.oscillators.forEach(oscillator => {
+    CONTROLLER.sequencer.oscillators.forEach(oscillator => {
       oscillator.lfoGain.gain.value = this.value;
     });
     $('#current-lfo-gain').text(this.value);
@@ -348,7 +388,7 @@ $(document).ready(function(){
 
   // lfo-vco-frequency
   document.getElementById('lfo-frequency').addEventListener('input', function() {
-    SEQUENCER.oscillators.forEach(oscillator => {
+    CONTROLLER.sequencer.oscillators.forEach(oscillator => {
       oscillator.lfo.frequency.value = this.value;
     });
     $('#current-lfo-frequency').text(this.value);
@@ -356,34 +396,35 @@ $(document).ready(function(){
 
   // lfo-filter-gain
   document.getElementById('lfo-filter-gain').addEventListener('input', function() {
-    SEQUENCER.lfoGain.gain.value = this.value;
+    CONTROLLER.setSequencerFilterLfoGain(this.value);
     $('#current-lfo-filter-gain').text(this.value);
   });
 
   // lfo-filter-frequency
   document.getElementById('lfo-filter-frequency').addEventListener('input', function() {
-    SEQUENCER.lfo.frequency.value= this.value;
+    CONTROLLER.setSequencerFilterLfoFrequency(this.value);
     $('#current-lfo-filter-frequency').text(this.value);
   });
 
+  // TODO: separate back/front concerns
   // vco coarse tune
   document.getElementById('tune-up').addEventListener('click', function() {
     $('#current-tuning').text(parseInt($('#current-tuning').text()) + 1);
-    SEQUENCER.oscillators.forEach(oscillator => {
+    CONTROLLER.sequencer.oscillators.forEach(oscillator => {
       oscillator.vco.frequency.value += 100;
     });
     $('#current-lfo-frequency').text(this.value);
   });
   document.getElementById('tune-down').addEventListener('click', function() {
     $('#current-tuning').text(parseInt($('#current-tuning').text()) - 1);
-    SEQUENCER.oscillators.forEach(oscillator => {
+    CONTROLLER.sequencer.oscillators.forEach(oscillator => {
       oscillator.vco.frequency.value -= 100;
     });
   });
 
   // vco fine tune
   document.getElementById('fine-tune').addEventListener('input', function() {
-    SEQUENCER.oscillators.forEach(oscillator => {
+    CONTROLLER.sequencer.oscillators.forEach(oscillator => {
       oscillator.vco.detune.value = parseInt(this.value  * 10);
     });
     $('#current-fine-tune').text(this.value);
@@ -391,16 +432,16 @@ $(document).ready(function(){
 
   // vco waveshape
   document.getElementById('vco-waveshape').addEventListener('change', function() {
-    SEQUENCER.oscillators.forEach(oscillator => {
+    CONTROLLER.sequencer.oscillators.forEach(oscillator => {
       oscillator.vco.type = $("input[name=waveshape]:checked").val();
     });
   });
 
   $('#start-sequencer').click(function(){
-    SEQUENCER.startSequencer()
+    CONTROLLER.startSequencer();
   });
 
   $('#stop-sequencer').click(function(){
-    SEQUENCER.stopSequencer()
+    CONTROLLER.stopSequencer();
   });
 });
