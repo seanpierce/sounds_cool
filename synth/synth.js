@@ -6,9 +6,7 @@ const KEYS = {
 }
 
 // global settings
-
-    var release = 0.15,
-    speed = 200,
+    var speed = 200,
     lfoGain = 8,
     lfoFrequency = 10,
     courseTune = 0,
@@ -39,7 +37,7 @@ class Oscillator {
   // envelope generator
   trigger() {
     this.vca.gain.setTargetAtTime(1, this.context.currentTime, this.parentSequencer.attack);
-    this.vca.gain.setTargetAtTime(0, this.context.currentTime + this.parentSequencer.attack, release);
+    this.vca.gain.setTargetAtTime(0, this.context.currentTime + this.parentSequencer.attack, this.parentSequencer.release);
   }
 }
 
@@ -65,6 +63,7 @@ class Sequencer {
     this.lfo.connect(this.lfoGain);
     this.lfo.start();
     this.attack = 0.01;
+    this.release = 0.15;
     this.genVCOs();
     this.masterVolume.gain.value = 0.5;
     this.masterVolume.connect(this.filter);
@@ -337,7 +336,7 @@ $(document).ready(function(){
 
   // release
   document.getElementById('release').addEventListener('input', function() {
-    release = this.value;
+    sequencer.release = this.value;
     $('#current-release').text(this.value);
   });
 
