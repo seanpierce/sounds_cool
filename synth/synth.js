@@ -315,6 +315,9 @@ function generatePreview(sequence){
 
 // ----------------------------------------- UI
 $(document).ready(function(){
+
+  var canvasContext = document.getElementById('oscilloscope').getContext('2d');
+
   function draw() {
     drawScope(CONTROLLER.sequencer.analyser, canvasContext);
     requestAnimationFrame(draw);
@@ -330,18 +333,18 @@ $(document).ready(function(){
 
     analyser.getByteTimeDomainData(timeData);
 
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.25';
-    ctx.fillRect(0, 0, height, width);
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.9';
+    ctx.fillRect(0, 0, 1000, 1000);
 
     ctx.lineWidth = 1;
     ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
     ctx.beginPath();
 
     // No buffer overrun protection
-    while (timeData[risingEdge++] - 128 > 0 && risingEdge <= width);
+    while (timeData[risingEdge++] - 100 > 0 && risingEdge <= width);
     if (risingEdge >= width) risingEdge = 0;
 
-    while (timeData[risingEdge++] - 128 < edgeThreshold && risingEdge <= width);
+    while (timeData[risingEdge++] - 100 < edgeThreshold && risingEdge <= width);
     if (risingEdge >= width) risingEdge = 0;
 
     for (let x = risingEdge; x < timeData.length && x - risingEdge < width; x++)
@@ -350,7 +353,7 @@ $(document).ready(function(){
     ctx.stroke();
   }
 
-  // draw();
+  draw();
 
   // request all sequences form API
   $.get("http://localhost:3000/sequences").done(sequences => {
