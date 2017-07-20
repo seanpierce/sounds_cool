@@ -5,10 +5,6 @@ const KEYS = {
   "polka_savage": []
 }
 
-// global settings
-    var courseTune = 0,
-    vclpf = 10000;
-
 class Oscillator {
   constructor(pitch, context, masterVolume, parentSequencer) {
     this.context = context;
