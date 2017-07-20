@@ -6,8 +6,7 @@ const KEYS = {
 }
 
 // global settings
-    var speed = 200,
-    lfoGain = 8,
+    var lfoGain = 8,
     lfoFrequency = 10,
     courseTune = 0,
     vclpf = 10000;
@@ -64,6 +63,7 @@ class Sequencer {
     this.lfo.start();
     this.attack = 0.01;
     this.release = 0.15;
+    this.speed = 200;
     this.genVCOs();
     this.masterVolume.gain.value = 0.5;
     this.masterVolume.connect(this.filter);
@@ -111,7 +111,7 @@ class Sequencer {
     } else {
       this.currentStep = 0;
     }
-    this.timeoutId = setTimeout(function(scope){ scope.step()}, speed, this)
+    this.timeoutId = setTimeout(function(scope){ scope.step()}, this.speed, this)
   }
 
   getIndeces(stepDads){
@@ -126,7 +126,7 @@ class Sequencer {
     // starts interval
     // saves intervalID as instance variable
     // interval triggers step method, every speed milliseconds
-    this.timeoutId = setTimeout(function(scope){ scope.step()}, speed, this)
+    this.timeoutId = setTimeout(function(scope){ scope.step()}, this.speed, this)
   }
 
   stopSequencer() {
@@ -323,7 +323,7 @@ $(document).ready(function(){
 
   // sequence speed
   document.getElementById('speed').addEventListener('input', function() {
-    speed = this.value;
+    sequencer.speed = this.value;
     $('#current-speed').text(this.value);
   });
 
