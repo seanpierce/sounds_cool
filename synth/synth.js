@@ -6,8 +6,7 @@ const KEYS = {
 }
 
 // global settings
-    var lfoGain = 8,
-    lfoFrequency = 10,
+    var lfoFrequency = 10,
     courseTune = 0,
     vclpf = 10000;
 
