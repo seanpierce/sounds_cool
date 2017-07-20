@@ -83,6 +83,8 @@ class Sequencer {
     this.filter.type  = "lowpass";
     this.filter.frequency.value = 10000;
     this.filter.Q.value = 1;
+    this.oscillatorCoarseTune = 0;
+    this.oscillatorFineTune = 0;
 
     // initialization
     this.lfo.start();
@@ -148,6 +150,38 @@ class Sequencer {
   stop() {
     clearTimeout(this.timeoutId);
   }
+
+  changeOscillatorCoarseTune(value) {
+    this.oscillatorCoarseTune += value;
+    this.oscillators.forEach(oscillator => {
+      oscillator.vco.frequency.value += 100 * value;
+    });
+  }
+
+  setOscillatorFineTune(value) {
+    this.oscillators.forEach(oscillator => {
+      oscillator.vco.detune.value = value * 10;
+    });
+  }
+
+  setOscillatorWaveShape(shape) {
+    this.oscillators.forEach(oscillator => {
+      oscillator.vco.type = shape
+    });
+  }
+
+  setLfoOscillatorGain(value) {
+    this.oscillators.forEach(oscillator => {
+      oscillator.lfoGain.gain.value = value;
+    });
+  }
+
+  setLfoOscillatorFrequency(value) {
+    this.oscillators.forEach(oscillator => {
+      oscillator.lfo.frequency.value = value;
+    });
+  }
+
 }
 
 class Controller {
@@ -378,19 +412,43 @@ $(document).ready(function(){
     $('#current-release').text(this.value);
   });
 
+  // TODO: separate back/front concerns
+  // vco coarse tune
+  document.getElementById('tune-up').addEventListener('click', function() {
+    CONTROLLER.sequencer.changeOscillatorCoarseTune(1);
+    let val = Number.parseInt($('#current-tuning').text());
+    $('#current-tuning').text(val + 1);
+  });
+  document.getElementById('tune-down').addEventListener('click', function() {
+    CONTROLLER.sequencer.changeOscillatorCoarseTune(-1);
+    let val = Number.parseInt($('#current-tuning').text());
+    $('#current-tuning').text(val - 1);
+  });
+
+  // vco fine tune
+  document.getElementById('fine-tune').addEventListener('input', function() {
+    let value = Number.parseInt(this.value);
+    CONTROLLER.sequencer.setOscillatorFineTune(value);
+    $('#current-fine-tune').text(value);
+  });
+
+  // vco waveshape
+  document.getElementById('vco-waveshape').addEventListener('change', function() {
+    let shape = $("input[name=waveshape]:checked").val();
+    CONTROLLER.sequencer.setOscillatorWaveShape(shape);
+  });
+
   // lfo-vco-gain
   document.getElementById('lfo-gain').addEventListener('input', function() {
-    CONTROLLER.sequencer.oscillators.forEach(oscillator => {
-      oscillator.lfoGain.gain.value = this.value;
-    });
-    $('#current-lfo-gain').text(this.value);
+    let value = Number.parseInt(this.value);
+    CONTROLLER.sequencer.setLfoOscillatorGain(value);
+    $('#current-lfo-gain').text(value);
   });
 
   // lfo-vco-frequency
   document.getElementById('lfo-frequency').addEventListener('input', function() {
-    CONTROLLER.sequencer.oscillators.forEach(oscillator => {
-      oscillator.lfo.frequency.value = this.value;
-    });
+    let value = Number.parseInt(this.value);
+    CONTROLLER.sequencer.setLfoOscillatorFrequency(value);
     $('#current-lfo-frequency').text(this.value);
   });
 
@@ -406,36 +464,6 @@ $(document).ready(function(){
     $('#current-lfo-filter-frequency').text(this.value);
   });
 
-  // TODO: separate back/front concerns
-  // vco coarse tune
-  document.getElementById('tune-up').addEventListener('click', function() {
-    $('#current-tuning').text(parseInt($('#current-tuning').text()) + 1);
-    CONTROLLER.sequencer.oscillators.forEach(oscillator => {
-      oscillator.vco.frequency.value += 100;
-    });
-    $('#current-lfo-frequency').text(this.value);
-  });
-  document.getElementById('tune-down').addEventListener('click', function() {
-    $('#current-tuning').text(parseInt($('#current-tuning').text()) - 1);
-    CONTROLLER.sequencer.oscillators.forEach(oscillator => {
-      oscillator.vco.frequency.value -= 100;
-    });
-  });
-
-  // vco fine tune
-  document.getElementById('fine-tune').addEventListener('input', function() {
-    CONTROLLER.sequencer.oscillators.forEach(oscillator => {
-      oscillator.vco.detune.value = parseInt(this.value  * 10);
-    });
-    $('#current-fine-tune').text(this.value);
-  });
-
-  // vco waveshape
-  document.getElementById('vco-waveshape').addEventListener('change', function() {
-    CONTROLLER.sequencer.oscillators.forEach(oscillator => {
-      oscillator.vco.type = $("input[name=waveshape]:checked").val();
-    });
-  });
 
   $('#start-sequencer').click(function(){
     CONTROLLER.startSequencer();
