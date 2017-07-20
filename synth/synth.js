@@ -6,8 +6,7 @@ const KEYS = {
 }
 
 // global settings
-    var lfoFrequency = 10,
-    courseTune = 0,
+    var courseTune = 0,
     vclpf = 10000;
 
 class Oscillator {
