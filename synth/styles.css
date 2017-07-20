@@ -24,15 +24,35 @@ input[type="range"] {
   padding: 5px;
 }
 
-/*grid style*/
-.row {
-  display: inline-block;
+/*------------------- UI -------------------------*/
+/* universal code */
+
+.preview {
+  width: 289px;
+  height: 289px;
+  margin-top: 25px;
+  margin-right: 25px;
+  padding-left: 25px;
+  padding-top: 25px;
+  box-shadow: 0px 5px 20px -9px black;
+  transition: box-shadow .3s ease-in;
 }
+
+.preview:hover {
+  box-shadow: 0px 5px 44px -9px black;
+}
+
 .square {
   display: block;
-  height: 20px;
-  width: 20px;
-  border: 1px solid black;
+  height: 35px;
+  width: 35px;
+  box-shadow: none;
+  -webkit-transition: box-shadow 5s ease-out;
+}
+
+.square:hover {
+  box-shadow: 0.5px 1px 4px -2px black;
+  -webkit-transition: box-shadow 0s ease-in;
 }
 
 .active {
@@ -40,12 +60,96 @@ input[type="range"] {
 }
 
 .marked {
-  background-color: black
+  background-color: black;
+  box-shadow: 0.5px 1px 4px -1px black;
+  -webkit-transition: box-shadow 0s ease-in;
+}
+
+.p-marked {
+  background-color: white
+}
+
+.p-col {
+  display: inline-block;
+}
+.col {
+  display: inline-block;
 }
 
 .pressed {
   background-color: white;
 }
+
 #tune-up, #tune-down {
   cursor: pointer;
+}
+
+.p-square {
+  display: block;
+  height: 15px;
+  width: 15px;
+  border: 0px solid white;
+}
+
+/* large breakpoint code */
+@media (min-width: 1101px) {
+  #controls {
+    width: 500px;
+  }
+  .preview {
+    display: inline-block;
+  }
+  #grids {
+    position: fixed;
+    height: 333px;
+    width: 100vw;
+    bottom: 10px;
+    overflow: auto;
+    white-space: nowrap;
+  }
+}
+
+#dynamic-wrapper {
+  height: calc(100vh - 333px);
+}
+
+#sequencer {
+  height: 560px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 67px;
+  max-width: 1143px;
+}
+
+#controls-panel {
+  width: 500px;
+  float: right;
+}
+
+#sequencer > * {
+  display: inline-block;
+}
+
+#sequencer #grid-box {
+  float: left;
+}
+
+
+
+/* medium breakpoint code */
+@media (max-width: 1100px) {
+  #grids {
+    height: 100vh;
+    overflow-y: scroll;
+  }
+
+  .preview {
+    width: 289px;
+    height: 289px;
+    margin-top: 25px;
+    padding-left: 25px;
+    padding-top: 25px;
+    box-shadow: 0px 5px 20px -9px black;
+    transition: box-shadow .3s ease-in;
+  }
 }
