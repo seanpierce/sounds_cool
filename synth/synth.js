@@ -147,9 +147,9 @@ function toggleMarked(element){
 
 function generateGrid(){
   for(var i = 0; i < sequencer.vcoCount; i++){
-    $("#grid").append(`<div class="row" id="row-${i}"></div>`)
+    $("#grid").append(`<div class="col" id="col-${i}"></div>`)
     for(var n = 0; n < sequencer.vcoCount; n++){
-      $(`#row-${i}`).append(`<div class="square" id="square-${(i*16)+n}"></div>`)
+      $(`#col-${i}`).append(`<div class="square" id="square-${(i*16)+n}"></div>`)
 
       $(`#square-${(i*16)+n}`).click(function(){
         var id = $(this).attr("id").match(/[0-9]+/)[0];
@@ -165,27 +165,27 @@ function placeMarkers(){
   for(var i = 0; i < 16; i++){
     var rowData = sequencer.sequenceData.substr(i*16, 16);
     for(var n = 0; n < 16; n++){
-      $(`#row-${i} #square-${(i*16)+n}`).removeClass("marked")
+      $(`#col-${i} #square-${(i*16)+n}`).removeClass("marked")
       if(rowData.charAt(n) === "1"){
-        $(`#row-${i} #square-${(i*16)+n}`).addClass("marked")
+        $(`#col-${i} #square-${(i*16)+n}`).addClass("marked")
       }
     }
   }
 }
 
-function highlightRow(rowId, indeces){
+function highlightRow(colId, indeces){
   var prev;
-  if(rowId === 0){
+  if(colId === 0){
     prev = 15;
   } else {
-    prev = rowId - 1;
+    prev = colId - 1;
   }
   for(var i = 0; i < 16; i++){
-    $(`#row-${prev} #square-${(prev*16)+i}`).removeClass("active pressed");
-    $(`#row-${rowId} #square-${(rowId*16)+i}`).addClass("active");
+    $(`#col-${prev} #square-${(prev*16)+i}`).removeClass("active pressed");
+    $(`#col-${colId} #square-${(colId*16)+i}`).addClass("active");
   }
   indeces.forEach(index => {
-    $(`#row-${rowId} #square-${(rowId*16)+index}`).addClass("pressed")
+    $(`#col-${colId} #square-${(colId*16)+index}`).addClass("pressed")
   });
 }
 
@@ -198,10 +198,39 @@ function getPattern(id){
   });
 }
 
+function placePreviewMarkers(sequence){
+  for(var i = 0; i < 16; i++){
+    var rowData = sequence.data.substr(i*16, 16);
+    for(var n = 0; n < 16; n++){
+      $(`#preview-${sequence.id} #p-col-${i} #p-square-${(i*16)+n}`).removeClass("p-marked")
+      if(rowData.charAt(n) === "1"){
+        $(`#preview-${sequence.id} #p-col-${i} #p-square-${(i*16)+n}`).addClass("p-marked")
+      }
+    }
+  }
+}
+
+function generatePreview(sequence){
+  $('#grids').append(`<div class="preview" id="preview-${sequence.id}"></div>`)
+  $(`#preview-${sequence.id}`).css("background-color",`rgb(${Math.floor(Math.random()*(255+1))},${Math.floor(Math.random()*(255+1))},${Math.floor(Math.random()*(255+1))})`)
+  for(var i = 0; i < sequencer.vcoCount; i++){
+    $(`#preview-${sequence.id}`).append(`<div class="p-col" id="p-col-${i}"></div>`)
+    for(var n = 0; n < sequencer.vcoCount; n++){
+      $(`#preview-${sequence.id} #p-col-${i}`).append(`<div class="p-square" id="p-square-${(i*16)+n}"></div>`)
+    }
+  }
+  $(`#preview-${sequence.id}`).click(function(){
+    // console.log('GIMME DATA');
+    // var id = $(this).attr('data-id');
+    getPattern(sequence.id);
+  })
+  placePreviewMarkers(sequence);
+}
+
 // ----------------------------------------- UI
 $(document).ready(function(){
 
-  var canvasContext = document.getElementById('oscilloscope').getContext('2d');
+  // var canvasContext = document.getElementById('oscilloscope').getContext('2d');
 
   function draw() {
     drawScope(sequencer.analyser, canvasContext);
@@ -238,33 +267,27 @@ $(document).ready(function(){
     ctx.stroke();
   }
 
-  draw();
+  // draw();
 
   // request all sequences form API
   $.get("http://localhost:3000/sequences").done(sequences => {
     sequences.forEach(sequence => {
+      generatePreview(sequence)
       $('#patterns').append(
         `<button class="pattern-button" data-id="${sequence.id}" >${sequence.title}</button>`
       );
-      // set sequence data onclick
-    });
-    $('.pattern-button').click(function() {
-      sequencer.sequenceData = $(this).attr('data-pattern');
     });
     $('.pattern-button').click(function(){
+      console.log('dang');
       var id = $(this).attr('data-id');
       getPattern(id);
-
-
     });
   });
 
   generateGrid();
-
-
-  sequencer.oscillators.forEach((osc, index) => {
-      $(".triggers").append(`<button class="button" id="${index}">${index+1}</button>`);
-  });
+  // sequencer.oscillators.forEach((osc, index) => {
+  //     $(".triggers").append(`<button class="button" id="${index}">${index+1}</button>`);
+  // });
 
   $(".button").click(function(){
     var index = parseInt($(this).attr('id'), 10);

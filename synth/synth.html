@@ -4,113 +4,124 @@
     <meta charset="utf-8">
     <title>Synth</title>
     <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
-    <!-- <script src="scripts.js" type="text/javascript"></script> -->
     <script src="synth.js" type="text/javascript"></script>
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
+    <div id="grids"></div>
 
-    <!-- Master volume, speed-->
-    <div class="module">
-      <div class="info">
-        <div class="half">
-          <label>Volume</label> <span id="current-master-volume" style='color:blue;'>0.5</span>
-          <input type="range" min="0" max="1" step="0.01" value="0.5" id="master-volume" />
+    <div id="dynamic-wrapper">
+      <div id="sequencer">
+        <div id="grid-box">
+          <div id="grid"></div>
         </div>
-        <div class="half right">
-          <label>Speed (ms)</label> <span id="current-speed" style='color:blue;'>200</span>
-          <input type="range" min="10" max="1000" step="10" value="200" id="speed" />
-        </div>
-      </div>
-    </div>
-
-    <!-- VCO control -->
-    <div class="module">
-        <div class="info">
-          <div class="half">
-            <label>VCO Coarse Tune</label>
-            <form id="coarse-tune">
-              <input type="radio" name="coarse-tune" value="low" checked="checked"> Low<br>
-              <input type="radio" name="coarse-tune" value="normal" checked="checked"> Normal<br>
-              <input type="radio" name="coarse-tune" value="high"> High<br>
-            </form>
+        <div id="controls-panel">
+          <!-- Master volume, speed-->
+          <div class="module">
+            <div class="info">
+              <div class="half">
+                <label>Volume</label> <span id="current-master-volume" style='color:blue;'>0.5</span>
+                <input type="range" min="0" max="1" step="0.01" value="0.5" id="master-volume" />
+              </div>
+              <div class="half right">
+                <label>Speed (ms)</label> <span id="current-speed" style='color:blue;'>200</span>
+                <input type="range" min="10" max="1000" step="10" value="200" id="speed" />
+              </div>
+                  <!-- <canvas id="oscilloscope" width="300" height="300"></canvas> -->
+            </div>
           </div>
-          <div class="half right">
-            <label>VCO Wave Shape</label>
-            <form id="vco-waveshape">
-              <input type="radio" name="waveshape" value="sine" checked="checked"> Sine<br>
-              <input type="radio" name="waveshape" value="square" checked="checked"> Square<br>
-              <input type="radio" name="waveshape" value="sawtooth"> Sawtooth<br>
-            </form>
+
+          <!-- VCO control -->
+          <div class="module">
+              <div class="info">
+                <div class="half">
+                  <label>VCO Coarse Tune</label>
+                  <form id="coarse-tune">
+                    <input type="radio" name="coarse-tune" value="low" checked="checked"> Low<br>
+                    <input type="radio" name="coarse-tune" value="normal" checked="checked"> Normal<br>
+                    <input type="radio" name="coarse-tune" value="high"> High<br>
+                  </form>
+                </div>
+                <div class="half right">
+                  <label>VCO Wave Shape</label>
+                  <form id="vco-waveshape">
+                    <input type="radio" name="waveshape" value="sine" checked="checked"> Sine<br>
+                    <input type="radio" name="waveshape" value="square" checked="checked"> Square<br>
+                    <input type="radio" name="waveshape" value="sawtooth"> Sawtooth<br>
+                  </form>
+                </div>
+              </div>
+          </div>
+
+          <!-- vcf -->
+          <div class="module">
+            <div class="info">
+              <div class="half">
+                <label>VCF</label> <span id="current-filter-cutoff" style='color:blue;'>10000</span>
+                <input type="range" min="0" max="10000" step="1" value="10000" id="filter" />
+              </div>
+              <div class="half right">
+                <label>VCQ</label> <span id="current-filter-reso" style='color:blue;'>5</span>
+                <input type="range" min="0" max="100" step="1" value="5" id="reso" />
+              </div>
+              <form id="filter-type">
+                <input type="radio" name="filter" value="lowpass" checked="checked"> Lowpass<br>
+                <input type="radio" name="filter" value="highpass"> Highpass<br>
+              </form>
+            </div>
+          </div>
+          <!-- vclfo > osc -->
+          <div class="module">
+            <div class="info">
+              <div class="half">
+                <label>LFO Gain > VCO</label> <span id="current-lfo-gain" style='color:blue;'>0</span>
+                <input type="range" min="0" max="100" step="1" value="0" id="lfo-gain" />
+              </div>
+              <div class="half right">
+                <label>LFO Frequency > VCO</label> <span id="current-lfo-frequency" style='color:blue;'>0</span>
+                <input type="range" min="0" max="100" step="1" value="0" id="lfo-frequency" />
+              </div>
+            </div>
+            <br>
+            <div class="info">
+              <div class="half">
+                <label>LFO Gain > VCF</label> <span id="current-lfo-filter-gain" style='color:blue;'>0</span>
+                <input type="range" min="0" max="1000" step="1" value="0" id="lfo-filter-gain" />
+              </div>
+              <div class="half right">
+                <label>LFO Frequency > VCF</label> <span id="current-lfo-filter-frequency" style='color:blue;'>0</span>
+                <input type="range" min="0" max="100" step="0.1" value="0" id="lfo-filter-frequency" />
+              </div>
+            </div>
+          </div>
+          <!-- VCEG -->
+          <div class="module">
+            <div class="info">
+              <div class="half">
+                <label>Attack</label> <span id="current-attack" style='color:blue;'>0</span>
+                <input type="range" min="0.01" max="1" step="0.01" value="0.01" id="attack" />
+              </div>
+              <div class="half right">
+                <label>Release</label> <span id="current-release" style='color:blue;'>0.15</span>
+                <input type="range" min="0" max="1" step="0.01" value="0.15" id="release" />
+              </div>
+            </div>
+          </div>
+          <!-- <div class="triggers"></div> -->
+          <div class="module">
+            <div class="info">
+              <div class="half">
+                <button type="button" id="start-sequencer">start</button>
+                <button type="button" id="stop-sequencer">stop</button>
+              </div>
+              <div class="half right">
+                <button type="button" id="save-pattern">save</button>
+              </div>
+            </div>
           </div>
         </div>
-    </div>
-
-    <!-- vcf -->
-    <div class="module">
-      <div class="info">
-        <div class="half">
-          <label>VCF</label> <span id="current-filter-cutoff" style='color:blue;'>10000</span>
-          <input type="range" min="0" max="10000" step="1" value="10000" id="filter" />
-        </div>
-        <div class="half right">
-          <label>VCQ</label> <span id="current-filter-reso" style='color:blue;'>5</span>
-          <input type="range" min="0" max="100" step="1" value="5" id="reso" />
-        </div>
-        <form id="filter-type">
-          <input type="radio" name="filter" value="lowpass" checked="checked"> Lowpass<br>
-          <input type="radio" name="filter" value="highpass"> Highpass<br>
-        </form>
       </div>
     </div>
-
-    <!-- vclfo > osc -->
-    <div class="module">
-      <div class="info">
-        <div class="half">
-          <label>LFO Gain > VCO</label> <span id="current-lfo-gain" style='color:blue;'>0</span>
-          <input type="range" min="0" max="100" step="1" value="0" id="lfo-gain" />
-        </div>
-        <div class="half right">
-          <label>LFO Frequency > VCO</label> <span id="current-lfo-frequency" style='color:blue;'>0</span>
-          <input type="range" min="0" max="100" step="1" value="0" id="lfo-frequency" />
-        </div>
-      </div>
-      <br>
-      <div class="info">
-        <div class="half">
-          <label>LFO Gain > VCF</label> <span id="current-lfo-filter-gain" style='color:blue;'>0</span>
-          <input type="range" min="0" max="1000" step="1" value="0" id="lfo-filter-gain" />
-        </div>
-        <div class="half right">
-          <label>LFO Frequency > VCF</label> <span id="current-lfo-filter-frequency" style='color:blue;'>0</span>
-          <input type="range" min="0" max="100" step="0.1" value="0" id="lfo-filter-frequency" />
-        </div>
-      </div>
-    </div>
-
-    <!-- VCEG -->
-    <div class="module">
-      <div class="info">
-        <div class="half">
-          <label>Attack</label> <span id="current-attack" style='color:blue;'>0</span>
-          <input type="range" min="0.01" max="1" step="0.01" value="0.01" id="attack" />
-        </div>
-        <div class="half right">
-          <label>Release</label> <span id="current-release" style='color:blue;'>0.15</span>
-          <input type="range" min="0" max="1" step="0.01" value="0.15" id="release" />
-        </div>
-      </div>
-    </div>
-
-    <hr>
-
-    <div class="triggers"></div>
-    <button type="button" id="start-sequencer">start</button>
-    <button type="button" id="stop-sequencer">stop</button>
-
-    <div id="patterns"></div>
-    <div id="grid"></div>
-    <canvas id="oscilloscope" width="300" height="300"></canvas>
+<!-- >>>>>>> ui-2.0 -->
   </body>
 </html>
