@@ -36,34 +36,47 @@ class Oscillator {
 
 class Sequencer {
   constructor(vcoCount, key, sequenceData) {
+    // parameter assignment
     this.vcoCount = vcoCount;
-    this.oscillators = [];
     this.key = key;
     this.sequenceData = sequenceData;
-    this.currentStep = 0;
+    this.oscillators = [];
+    // context initialization
     this.context = new window.AudioContext();
-    this.masterVolume = this.context.createGain();
-    this.filter = this.context.createBiquadFilter();
-    this.filter.type  = "lowpass";
-    this.filter.frequency.value = 10000;
-    this.filter.connect(this.context.destination);
-    this.lfoGain = this.context.createGain();
-    this.lfo = this.context.createOscillator();
-    this.lfo.type = "sine";
-    this.lfoGain.gain.value = 0;
-    this.lfoGain.connect(this.filter.detune);
-    this.lfo.frequency.value = 0;
-    this.lfo.connect(this.lfoGain);
-    this.lfo.start();
+    // static initialization
+    this.currentStep = 0;
     this.attack = 0.01;
     this.release = 0.15;
     this.speed = 200;
-    this.genVCOs();
-    this.masterVolume.gain.value = 0.5;
-    this.masterVolume.connect(this.filter);
+
+    // creation
+    this.masterVolume = this.context.createGain();
+    this.filter = this.context.createBiquadFilter();
+    this.lfoGain = this.context.createGain();
+    this.lfo = this.context.createOscillator();
     this.analyser = this.context.createAnalyser();
-    this.masterVolume.connect(this.analyser);
+
+    // connection
+    this.lfoGain.connect(this.filter.detune);
+    this.lfo.connect(this.lfoGain);
+    this.masterVolume.connect(this.filter);
+    this.filter.connect(this.analyser);
+    this.filter.connect(this.context.destination);
+
+    // configuration
+    this.lfo.type = "sine";
+    this.lfoGain.gain.value = 0;
+    this.lfo.frequency.value = 0;
+    this.masterVolume.gain.value = 0.5;
+    this.filter.type  = "lowpass";
+    this.filter.frequency.value = 10000;
+
+    // initialization
+    this.lfo.start();
+    this.genVCOs();
+
   }
+  
   genVCOs() {
     for(var i=1; i <= this.vcoCount; i++) {
       var pitch = KEYS['c_major_garbage'][i-1];
