@@ -1,11 +1,18 @@
 const KEYS = {
   "c_major_garbage": [65.41, 73.42, 82.41, 87.31, 98.00, 110.00, 123.47, 130.81, 146.83, 164.81, 174.61, 196.00, 220.00, 246.94, 261.63, 293.66],
   "dj_barakas": [],
-  "depressed_daikon": []
+  "depressed_daikon": [],
+  "polka_savage": []
 }
 
-var release = 0.15;
-var speed = 200;
+// global VCO settings
+var attack = 0.01,
+    release = 0.15,
+    speed = 200,
+    lfoGain = 8,
+    lfoFrequency = 10,
+    courseTune = 0,
+    vclpf = 10000;
 
 class Oscillator {
   constructor(pitch, context, masterVolume) {
@@ -18,12 +25,20 @@ class Oscillator {
     this.vco.type = "square";
     this.vco.start();
     this.vca.gain.value = 0;
+    this.lfoGain = context.createGain();
+    this.lfo = context.createOscillator();
+    this.lfo.type = "sine";
+    this.lfoGain.gain.value = 0;
+    this.lfoGain.connect(this.vco.frequency);
+    this.lfo.frequency.value = 0;
+    this.lfo.connect(this.lfoGain);
+    this.lfo.start();
   }
 
-  trigger(){
-    // this.vca.gain.value = 1;
-    this.vca.gain.setTargetAtTime(1, this.context.currentTime, 0.01);
-    this.vca.gain.setTargetAtTime(0, this.context.currentTime + 0.01, release);
+  // envelope generator
+  trigger() {
+    this.vca.gain.setTargetAtTime(1, this.context.currentTime, attack);
+    this.vca.gain.setTargetAtTime(0, this.context.currentTime + attack, release);
   }
 }
 
@@ -36,25 +51,28 @@ class Sequencer {
     this.currentStep = 0;
     this.context = new window.AudioContext();
     this.masterVolume = this.context.createGain();
-    // this.panner = this.context.createStereoPanner();
-    // this.lfoFreqGain = this.context.createGain();
-    // this.lfo = this.context.createOscillator();
     this.filter = this.context.createBiquadFilter();
+    this.filter.type  = "lowpass";
     this.filter.frequency.value = 10000;
+    this.filter.connect(this.context.destination);
+    this.lfoGain = this.context.createGain();
+    this.lfo = this.context.createOscillator();
+    this.lfo.type = "sine";
+    this.lfoGain.gain.value = 0;
+    this.lfoGain.connect(this.filter.detune);
+    this.lfo.frequency.value = 0;
+    this.lfo.connect(this.lfoGain);
+    this.lfo.start();
     this.genVCOs();
     this.masterVolume.gain.value = 0.5;
     this.masterVolume.connect(this.filter);
-    this.filter.connect(this.context.destination);
+    this.analyser = this.context.createAnalyser();
+    this.masterVolume.connect(this.analyser);
   }
   genVCOs() {
     for(var i=1; i <= this.vcoCount; i++) {
       var pitch = KEYS['c_major_garbage'][i-1];
-      var osc = new Oscillator(pitch, this.context, this.masterVolume)
-      // var vco = context.createOscillator(pitch, context);
-      // vco.frequency.value = KEYS['c_major'][i-1]; // key value
-      // vco.type = "square";
-      // vco.connect(vca);
-      // vco.start();
+      var osc = new Oscillator(pitch, this.context, this.masterVolume);
       this.oscillators.push(osc);
     }
   }
@@ -183,6 +201,45 @@ function getPattern(id){
 // ----------------------------------------- UI
 $(document).ready(function(){
 
+  var canvasContext = document.getElementById('oscilloscope').getContext('2d');
+
+  function draw() {
+    drawScope(sequencer.analyser, canvasContext);
+    requestAnimationFrame(draw);
+  }
+
+  function drawScope(analyser, ctx) {
+    var width = ctx.canvas.width;
+    var height = ctx.canvas.height;
+    var timeData = new Uint8Array(analyser.frequencyBinCount);
+    var scaling = height / 256;
+    var risingEdge = 0;
+    var edgeThreshold = 0;
+
+    analyser.getByteTimeDomainData(timeData);
+
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.25';
+    ctx.fillRect(0, 0, height, width);
+
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
+    ctx.beginPath();
+
+    // No buffer overrun protection
+    while (timeData[risingEdge++] - 128 > 0 && risingEdge <= width);
+    if (risingEdge >= width) risingEdge = 0;
+
+    while (timeData[risingEdge++] - 128 < edgeThreshold && risingEdge <= width);
+    if (risingEdge >= width) risingEdge = 0;
+
+    for (var x = risingEdge; x < timeData.length && x - risingEdge < width; x++)
+      ctx.lineTo(x - risingEdge, height - timeData[x] * scaling);
+
+    ctx.stroke();
+  }
+
+  draw();
+
   // request all sequences form API
   $.get("http://localhost:3000/sequences").done(sequences => {
     sequences.forEach(sequence => {
@@ -193,7 +250,6 @@ $(document).ready(function(){
     });
     $('.pattern-button').click(function() {
       sequencer.sequenceData = $(this).attr('data-pattern');
-      console.log('dang');
     });
     $('.pattern-button').click(function(){
       var id = $(this).attr('data-id');
@@ -234,16 +290,63 @@ $(document).ready(function(){
     $('#current-filter-reso').text(this.value);
   });
 
+  // filter type
+  document.getElementById('filter-type').addEventListener('change', function() {
+    sequencer.filter.type = $("input[name=filter]:checked").val();
+  });
+
   // sequence speed
   document.getElementById('speed').addEventListener('input', function() {
     speed = this.value;
     $('#current-speed').text(this.value);
   });
 
+  // attack
+  // NOTE: why why why does to precision get funky?
+  document.getElementById('attack').addEventListener('input', function() {
+    attack = Number.parseFloat(this.value)
+    $('#current-attack').text(this.value);
+  });
+
   // release
   document.getElementById('release').addEventListener('input', function() {
     release = this.value;
     $('#current-release').text(this.value);
+  });
+
+  // lfo-vco-gain
+  document.getElementById('lfo-gain').addEventListener('input', function() {
+    sequencer.oscillators.forEach(oscillator => {
+      oscillator.lfoGain.gain.value = this.value;
+    });
+    $('#current-lfo-gain').text(this.value);
+  });
+
+  // lfo-vco-frequency
+  document.getElementById('lfo-frequency').addEventListener('input', function() {
+    sequencer.oscillators.forEach(oscillator => {
+      oscillator.lfo.frequency.value = this.value;
+    });
+    $('#current-lfo-frequency').text(this.value);
+  });
+
+  // lfo-filter-gain
+  document.getElementById('lfo-filter-gain').addEventListener('input', function() {
+    sequencer.lfoGain.gain.value = this.value;
+    $('#current-lfo-filter-gain').text(this.value);
+  });
+
+  // lfo-filter-frequency
+  document.getElementById('lfo-filter-frequency').addEventListener('input', function() {
+    sequencer.lfo.frequency.value= this.value;
+    $('#current-lfo-filter-frequency').text(this.value);
+  });
+
+  // vco waveshape
+  document.getElementById('vco-waveshape').addEventListener('change', function() {
+    sequencer.oscillators.forEach(oscillator => {
+      oscillator.vco.type = $("input[name=waveshape]:checked").val();
+    });
   });
 
   $('#start-sequencer').click(function(){

@@ -1,13 +1,20 @@
 input[type="range"] {
   width: 100%;
 }
+.half {
+  width: 48%;
+  display: inline-block;
+}
+.right {
+  float: right;
+}
 .module {
   background-color: #f3f3f3;
   padding: 20px;
   border-bottom: solid 2px #bcbcbc;
   margin-bottom: 1em;
   width: 100%;
-  max-width: 600px;
+  max-width: 500px;
 }
 #repeater-on, #repeater-off, #trigger-once {
   cursor: pointer;
