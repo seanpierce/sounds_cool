@@ -2,28 +2,41 @@ const KEYS = {
   "c_major_garbage": [65.41, 73.42, 82.41, 87.31, 98.00, 110.00, 123.47, 130.81, 146.83, 164.81, 174.61, 196.00, 220.00, 246.94, 261.63, 293.66],
   "dj_barakas": [],
   "depressed_daikon": [],
-  "polka_savage": []
+  "polka_savage": [],
+  "teachers_making_weed_jokes": [61.74, 69.30, 82.41, 92.50, 123.47, 138.59, 164.81, 185.00, 220.00, 246.94, 277.18, 329.63, 369.99, 440.00, 493.88, 587.33],
+  "mc_commune": []
 }
 
 class Oscillator {
   constructor(pitch, context, masterVolume, parentSequencer) {
+    // parameter assignment
     this.context = context;
     this.parentSequencer = parentSequencer;
+
+    // creation
     this.vco = context.createOscillator();
-    this.vco.frequency.value = pitch;
     this.vca = context.createGain();
-    this.vco.connect(this.vca);
-    this.vca.connect(masterVolume);
-    this.vco.type = "square";
-    this.vco.start();
-    this.vca.gain.value = 0;
-    this.lfoGain = context.createGain();
     this.lfo = context.createOscillator();
-    this.lfo.type = "sine";
-    this.lfoGain.gain.value = 0;
-    this.lfoGain.connect(this.vco.frequency);
-    this.lfo.frequency.value = 0;
+    this.lfoGain = context.createGain();
+
+    // connection
+    this.vca.connect(masterVolume);
+    this.vco.connect(this.vca);
     this.lfo.connect(this.lfoGain);
+    this.lfoGain.connect(this.vco.frequency);
+
+
+    // configuration
+    this.vco.type = "square";
+    this.vco.frequency.value = pitch;
+    this.vca.gain.value = 0;
+    this.lfo.type = "sine";
+    this.lfo.frequency.value = 0;
+    this.lfoGain.gain.value = 0;
+
+
+    // initialization
+    this.vco.start();
     this.lfo.start();
   }
 
@@ -48,7 +61,7 @@ class Sequencer {
     this.attack = 0.01;
     this.release = 0.15;
     this.speed = 200;
-    this.key = 'c_major_garbage';
+    this.key = 'teachers_making_weed_jokes';
 
     // creation
     this.masterVolume = this.context.createGain();
