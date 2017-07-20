@@ -5,7 +5,7 @@ const KEYS = {
   "polka_savage": []
 }
 
-// global VCO settings
+// global settings
 var attack = 0.01,
     release = 0.15,
     speed = 200,
@@ -181,12 +181,14 @@ function highlightRow(colId, indeces){
     prev = colId - 1;
   }
   for(var i = 0; i < 16; i++){
-    $(`#col-${prev} #square-${(prev*16)+i}`).removeClass("active pressed");
-    $(`#col-${colId} #square-${(colId*16)+i}`).addClass("active");
+    $(`#col-${prev}`).removeClass("active")
+    $(`#col-${colId}`).addClass("active")
+    // $(`#col-${prev} #square-${(prev*16)+i}`).removeClass("active pressed");
+    // $(`#col-${colId} #square-${(colId*16)+i}`).addClass("active");
   }
-  indeces.forEach(index => {
-    $(`#col-${colId} #square-${(colId*16)+index}`).addClass("pressed")
-  });
+  // indeces.forEach(index => {
+  //   $(`#col-${colId} #square-${(colId*16)+index}`).addClass("pressed")
+  // });
 }
 
 function getPattern(id){
