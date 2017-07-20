@@ -6,8 +6,8 @@ const KEYS = {
 }
 
 // global settings
-var attack = 0.01,
-    release = 0.15,
+
+    var release = 0.15,
     speed = 200,
     lfoGain = 8,
     lfoFrequency = 10,
@@ -15,8 +15,9 @@ var attack = 0.01,
     vclpf = 10000;
 
 class Oscillator {
-  constructor(pitch, context, masterVolume) {
+  constructor(pitch, context, masterVolume, parentSequencer) {
     this.context = context;
+    this.parentSequencer = parentSequencer;
     this.vco = context.createOscillator();
     this.vco.frequency.value = pitch;
     this.vca = context.createGain();
@@ -37,8 +38,8 @@ class Oscillator {
 
   // envelope generator
   trigger() {
-    this.vca.gain.setTargetAtTime(1, this.context.currentTime, attack);
-    this.vca.gain.setTargetAtTime(0, this.context.currentTime + attack, release);
+    this.vca.gain.setTargetAtTime(1, this.context.currentTime, this.parentSequencer.attack);
+    this.vca.gain.setTargetAtTime(0, this.context.currentTime + this.parentSequencer.attack, release);
   }
 }
 
@@ -63,6 +64,7 @@ class Sequencer {
     this.lfo.frequency.value = 0;
     this.lfo.connect(this.lfoGain);
     this.lfo.start();
+    this.attack = 0.01;
     this.genVCOs();
     this.masterVolume.gain.value = 0.5;
     this.masterVolume.connect(this.filter);
@@ -72,7 +74,7 @@ class Sequencer {
   genVCOs() {
     for(var i=1; i <= this.vcoCount; i++) {
       var pitch = KEYS['c_major_garbage'][i-1];
-      var osc = new Oscillator(pitch, this.context, this.masterVolume);
+      var osc = new Oscillator(pitch, this.context, this.masterVolume, this);
       this.oscillators.push(osc);
     }
   }
@@ -329,7 +331,7 @@ $(document).ready(function(){
   // attack
   // NOTE: why why why does to precision get funky?
   document.getElementById('attack').addEventListener('input', function() {
-    attack = Number.parseFloat(this.value)
+    sequencer.attack = Number.parseFloat(this.value)
     $('#current-attack').text(this.value);
   });
 
