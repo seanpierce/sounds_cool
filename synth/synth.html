@@ -4,51 +4,58 @@
     <meta charset="utf-8">
     <title>Synth</title>
     <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
-    <!-- <script src="scripts.js" type="text/javascript"></script> -->
     <script src="synth.js" type="text/javascript"></script>
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
 
-    <!-- Master Volume -->
-    <div class="module">
-      <div class="info">
-        <label>Master Volume</label> <span id="current-master-volume" style='color:blue;'>0</span>
+    <div id="grids"></div>
+
+    <div id="dynamic-wrapper">
+      <div id="sequencer">
+        <div id="grid-box">
+          <div id="grid"></div>
+        </div>
+        <div id="controls-panel">
+          <!-- master volume -->
+          <div class="module">
+            <div class="info">
+              <label>Master Volume</label> <span id="current-master-volume" style='color:blue;'>0</span>
+            </div>
+            <input type="range" min="0" max="1" step="0.01" value="0" id="master-volume" />
+          </div>
+          <!-- vcf -->
+          <div class="module">
+            <div class="info">
+              <label>VCF, Lowpass</label> <span id="current-filter-cutoff" style='color:blue;'>10000</span>
+            </div>
+            <input type="range" min="0" max="10000" step="1" value="10000" id="filter" />
+          </div>
+          <!-- vcf Q -->
+          <div class="module">
+            <div class="info">
+              <label>VCQ</label> <span id="current-filter-reso" style='color:blue;'>5</span>
+            </div>
+            <input type="range" min="0" max="100" step="1" value="5" id="reso" />
+          </div>
+          <!-- release -->
+          <div class="module">
+            <div class="info">
+              <label>VC Release</label> <span id="current-release" style='color:blue;'>0.15</span>
+            </div>
+            <input type="range" min="0" max="1" step="0.01" value="0.15" id="release" />
+          </div>
+          <!-- play controls -->
+          <div class="module">
+            <div class="info">
+              <!-- <div class="triggers"></div> -->
+              <div id="patterns"></div>
+              <button type="button" id="start-sequencer">start</button>
+              <button type="button" id="stop-sequencer">stop</button>
+            </div>
+          </div>
+        </div>
       </div>
-      <input type="range" min="0" max="1" step="0.01" value="0" id="master-volume" />
     </div>
-
-    <!-- vcf -->
-    <div class="module">
-      <div class="info">
-        <label>VCF, Lowpass</label> <span id="current-filter-cutoff" style='color:blue;'>10000</span>
-      </div>
-      <input type="range" min="0" max="10000" step="1" value="10000" id="filter" />
-    </div>
-
-    <!-- vcf Q -->
-    <div class="module">
-      <div class="info">
-        <label>VCQ</label> <span id="current-filter-reso" style='color:blue;'>5</span>
-      </div>
-      <input type="range" min="0" max="100" step="1" value="5" id="reso" />
-    </div>
-
-    <!-- release -->
-    <div class="module">
-      <div class="info">
-        <label>VC Release</label> <span id="current-release" style='color:blue;'>0.15</span>
-      </div>
-      <input type="range" min="0" max="1" step="0.01" value="0.15" id="release" />
-    </div>
-
-    <hr>
-
-    <div class="triggers"></div>
-    <button type="button" id="start-sequencer">start</button>
-    <button type="button" id="stop-sequencer">stop</button>
-
-    <div id="patterns"></div>
-    <div id="grid"></div>
   </body>
 </html>
