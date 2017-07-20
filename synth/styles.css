@@ -46,3 +46,6 @@ input[type="range"] {
 .pressed {
   background-color: white;
 }
+#tune-up, #tune-down {
+  cursor: pointer;
+}

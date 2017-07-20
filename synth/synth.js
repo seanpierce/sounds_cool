@@ -342,6 +342,29 @@ $(document).ready(function(){
     $('#current-lfo-filter-frequency').text(this.value);
   });
 
+  // vco coarse tune
+  document.getElementById('tune-up').addEventListener('click', function() {
+    $('#current-tuning').text(parseInt($('#current-tuning').text()) + 1);
+    sequencer.oscillators.forEach(oscillator => {
+      oscillator.vco.frequency.value += 100;
+    });
+    $('#current-lfo-frequency').text(this.value);
+  });
+  document.getElementById('tune-down').addEventListener('click', function() {
+    $('#current-tuning').text(parseInt($('#current-tuning').text()) - 1);
+    sequencer.oscillators.forEach(oscillator => {
+      oscillator.vco.frequency.value -= 100;
+    });
+  });
+
+  // vco fine tune
+  document.getElementById('fine-tune').addEventListener('input', function() {
+    sequencer.oscillators.forEach(oscillator => {
+      oscillator.vco.detune.value = parseInt(this.value  * 10);
+    });
+    $('#current-fine-tune').text(this.value);
+  });
+
   // vco waveshape
   document.getElementById('vco-waveshape').addEventListener('change', function() {
     sequencer.oscillators.forEach(oscillator => {

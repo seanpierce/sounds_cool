@@ -26,24 +26,25 @@
 
     <!-- VCO control -->
     <div class="module">
-        <div class="info">
-          <div class="half">
-            <label>VCO Coarse Tune</label>
-            <form id="coarse-tune">
-              <input type="radio" name="coarse-tune" value="low" checked="checked"> Low<br>
-              <input type="radio" name="coarse-tune" value="normal" checked="checked"> Normal<br>
-              <input type="radio" name="coarse-tune" value="high"> High<br>
-            </form>
-          </div>
-          <div class="half right">
-            <label>VCO Wave Shape</label>
-            <form id="vco-waveshape">
-              <input type="radio" name="waveshape" value="sine" checked="checked"> Sine<br>
-              <input type="radio" name="waveshape" value="square" checked="checked"> Square<br>
-              <input type="radio" name="waveshape" value="sawtooth"> Sawtooth<br>
-            </form>
-          </div>
+      <div class="info">
+        <div class="half">
+          <label>VCO Fine Tune</label> <span id="current-fine-tune" style='color:blue;'>0</span>
+          <input type="range" min="-100" max="100" step="1" value="0" id="fine-tune">
+          <br><br>
+          <label>VCO Coarse Tune</label> <span id="current-tuning" style='color:blue;'>1</span>
+          <br>
+          <span id="tune-down">▼</span>
+          <span id="tune-up">▲</span>
         </div>
+        <div class="half right">
+          <label>VCO Wave Shape</label>
+          <form id="vco-waveshape">
+            <input type="radio" name="waveshape" value="sine" checked="checked"> Sine<br>
+            <input type="radio" name="waveshape" value="square" checked="checked"> Square<br>
+            <input type="radio" name="waveshape" value="sawtooth"> Sawtooth<br>
+          </form>
+        </div>
+      </div>
     </div>
 
     <!-- vcf -->
