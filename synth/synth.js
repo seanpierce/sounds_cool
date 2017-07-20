@@ -368,6 +368,12 @@ $(document).ready(function(){
 
   generateGrid();
 
+  // new sequence
+  // save sequence
+  document.getElementById('save-sequence').addEventListener('click', function(){
+    CONTROLLER.sequencer.updateSequence();
+  });
+
   // master volume
   document.getElementById('master-volume').addEventListener('input', function() {
     CONTROLLER.setSequencerMasterVolume(this.value);
