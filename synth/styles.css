@@ -1,7 +1,7 @@
 :root {
   --blue: #0074D9;
-  --slider-thumb-height: 20px;
-  --slider-thumb-width: 10px;
+  --slider-thumb-height: 25px;
+  --slider-thumb-width: 12px;
   --track-height: 2px;
   --track-color: #333;
 }

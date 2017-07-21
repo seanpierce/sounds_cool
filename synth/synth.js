@@ -333,18 +333,18 @@ $(document).ready(function(){
 
     analyser.getByteTimeDomainData(timeData);
 
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.9';
+    ctx.fillStyle = 'rgba(255, 255, 255, 1)';
     ctx.fillRect(0, 0, 1000, 1000);
 
-    ctx.lineWidth = 1;
-    ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = 'rgba(0,116,217,1)';
     ctx.beginPath();
 
     // No buffer overrun protection
-    while (timeData[risingEdge++] - 100 > 0 && risingEdge <= width);
+    while (timeData[risingEdge++] - 128 > 0 && risingEdge <= width);
     if (risingEdge >= width) risingEdge = 0;
 
-    while (timeData[risingEdge++] - 100 < edgeThreshold && risingEdge <= width);
+    while (timeData[risingEdge++] - 128 < edgeThreshold && risingEdge <= width);
     if (risingEdge >= width) risingEdge = 0;
 
     for (let x = risingEdge; x < timeData.length && x - risingEdge < width; x++)
