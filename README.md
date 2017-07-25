@@ -1,24 +1,18 @@
-# README
+<img src="wave.png">
+# sounds_cool
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+sounds_cool is a browser-based, fully analog-modeled synthesizer with sequencer. Developed using the Web Audio API, a user has full control over the synthesizer's pitch, filter, envelope and modulation parameters. The sequencer is connected to a custom made API which will store and recall a user's patterns on the fly.
 
-Things you may want to cover:
+*Currently in development*. You can play with demo [here](https://seanpierce.github.io/sounds_cool/)
 
-* Ruby version
 
-* System dependencies
+<img src="sounds_cool.gif">
 
-* Configuration
+### Authors
+Sean Pierce Sumler, Aubrey Masten
 
-* Database creation
+### Contact
+sumler.sean@gmail.com
 
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+### License
+MIT &copy; 2017, Sean Pierce Sumler and Aubrey Masten
