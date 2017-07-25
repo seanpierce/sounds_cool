@@ -161,7 +161,7 @@ input[type=range]:focus::-ms-fill-upper {
 }
 
 .active {
-  background-color: red;
+  background-color: var(--blue);
 }
 
 .marked {
@@ -216,6 +216,7 @@ input[type=range]:focus::-ms-fill-upper {
 
 #dynamic-wrapper {
   height: calc(100vh - 333px);
+  margin-bottom: 30em;
 }
 
 #sequencer {
