@@ -53,7 +53,7 @@ class Sequencer {
     this.sequenceData = sequenceData;
     this.oscillators = [];
     // context initialization
-    this.context = new window.AudioContext();
+    this.context = new AudioContext();
     // static initialization
     this.currentStep = 0;
     this.attack = 0.01;
@@ -107,18 +107,18 @@ class Sequencer {
 
   // TODO: call method on save click
   // updates sequence in API
-  updateSequence() {
-    $.ajax({
-      url: `http://localhost:3000/sequences/${this.sequenceId}`,
-      type: "PUT",
-      data: {
-        title: this.sequenceTitle,
-        data: this.sequenceData,
-        speed: 200,
-        width: 300
-      }
-    });
-  }
+  // updateSequence() {
+  //   $.ajax({
+  //     url: `http://localhost:3000/sequences/${this.sequenceId}`,
+  //     type: "PUT",
+  //     data: {
+  //       title: this.sequenceTitle,
+  //       data: this.sequenceData,
+  //       speed: 200,
+  //       width: 300
+  //     }
+  //   });
+  // }
 
   // plays oscillators at indeces in osillatorArray
   // corresponding to indeces in current step sequence data where digit is 1
@@ -187,6 +187,11 @@ class Sequencer {
 class Controller {
   constructor() {
     this.sequencer = new Sequencer(16, 'c_major',"0000000000000001000000000000000000000000000010000000000000010000000000000010000000000000010000000000000010000000000000000000000100000010010000000000010000000000000010000000000000010000000000000000000000000000000010000000000010000000000000000000001000000001");
+  }
+
+  newSequence(value) {
+    this.sequencer.sequenceData = value;
+    $(".square").removeClass('marked');
   }
 
   setSequencerMasterVolume(value) {
@@ -277,14 +282,14 @@ function highlightRow(colId){
   }
 }
 
-function getPattern(id){
-  $.get(`http://localhost:3000/sequences/${id}`).done(sequence => {
-    CONTROLLER.sequencer.sequenceTitle = sequence.title;
-    CONTROLLER.sequencer.sequenceData = sequence.data;
-    CONTROLLER.sequencer.sequenceId = sequence.id;
-    placeMarkers();
-  });
-}
+// function getPattern(id){
+//   $.get(`http://localhost:3000/sequences/${id}`).done(sequence => {
+//     CONTROLLER.sequencer.sequenceTitle = sequence.title;
+//     CONTROLLER.sequencer.sequenceData = sequence.data;
+//     CONTROLLER.sequencer.sequenceId = sequence.id;
+//     placeMarkers();
+//   });
+// }
 
 function placePreviewMarkers(sequence){
   for(let i = 0; i < 16; i++){
@@ -356,25 +361,25 @@ $(document).ready(function(){
   draw();
 
   // request all sequences form API
-  $.get("http://localhost:3000/sequences").done(sequences => {
-    sequences.forEach(sequence => {
-      generatePreview(sequence)
-      $('#patterns').append(
-        `<button class="pattern-button" data-id="${sequence.id}" >${sequence.title}</button>`
-      );
-    });
-    $('.pattern-button').click(function(){
-      let id = $(this).attr('data-id');
-      getPattern(id);
-    });
-  });
+  // $.get("http://localhost:3000/sequences").done(sequences => {
+  //   sequences.forEach(sequence => {
+  //     generatePreview(sequence)
+  //     $('#patterns').append(
+  //       `<button class="pattern-button" data-id="${sequence.id}" >${sequence.title}</button>`
+  //     );
+  //   });
+  //   $('.pattern-button').click(function(){
+  //     let id = $(this).attr('data-id');
+  //     getPattern(id);
+  //   });
+  // });
 
   generateGrid();
 
   // new sequence
   // save sequence
   document.getElementById('save-sequence').addEventListener('click', function(){
-    CONTROLLER.sequencer.updateSequence();
+    // CONTROLLER.sequencer.updateSequence();
   });
 
   // master volume
@@ -480,5 +485,13 @@ $(document).ready(function(){
 
   $('#stop-sequencer').click(function(){
     CONTROLLER.stopSequencer();
+  });
+
+
+
+
+  // clear pattern on 'new' button click
+  $('#new-sequence').click(function() {
+    CONTROLLER.newSequence("0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000");
   });
 });
